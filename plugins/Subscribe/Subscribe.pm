@@ -157,7 +157,7 @@ sub _subscribeDecisionPage {
 	# within prepareUser(), after currentPage has been set.  So we
 	# can almost certainly switch to using currentPage.
 	my $decision = 0;
-	$r ||= Apache->request;
+	$r ||= Apache2::RequestUtil->request;
 	my $uri = $r->uri;
 	if ($uri eq '/') {
 		$uri = 'index';

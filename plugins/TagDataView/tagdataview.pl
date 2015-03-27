@@ -272,7 +272,7 @@ sub fhpopgraph {
 
 sub emit_image_header {
 	my($content_type) = @_;
-	my $r = Apache->request;
+	my $r = Apache2::RequestUtil->request;
 	$r->content_type($content_type);
 	# the "private" may be optional, but should do what we want
 	$r->header_out('Cache-Control', 'private');

@@ -392,7 +392,7 @@ we scan that log hourly to decide who to give moderator points to.
 In fact, the I/O load for the accesslog table is several times the I/O
 of all other database writes combined.  And that's assuming you don't
 log image hits!  (Slashdot's load balancer sets image hits to static
-web servers which don't have the PerlCleanupHandler Slash::Apache::Log.)
+web servers which don't have the PerlCleanupHandler Slash::Apache2::Log.)
 
 There are two ways you can reduce your accesslog load.  The first is
 to just create a type="log_slave" row in the dbs table, pointing to a
@@ -481,7 +481,7 @@ meta-moderation
 		reconcilation (tasks/run_moderatord.pl)
 plugins/Messages: the messaging system
 	(pudge: what to say about this?)
-AL2 and Slash::Apache::Banlist
+AL2 and Slash::Apache2::Banlist
 writing RSS pages: open_backend.pl
 plugins/HumanConf
 sections

@@ -24,8 +24,9 @@ LONG DESCRIPTION.
 =cut
 
 use strict;
-use Apache;
-use Apache::Constants ':http';
+use Apache2;
+use Apache2::Const qw(:http);
+use Apache2::RequestUtil ();
 use Digest::MD5 'md5_hex';
 use Encode 'encode_utf8';
 use Slash::Display;
@@ -118,7 +119,7 @@ sub header {
 
 	my $r;
 	unless ($form->{ssi} || $form->{taskgen}) {
-		$r = Apache->request;
+		$r = Apache2::RequestUtil->request;
 
 		$r->content_type($constants->{content_type_webpage}
 			|| $options->{content_type}
@@ -272,7 +273,7 @@ sub http_send {
 	$opt->{cache_control} ||= 'private'  unless defined $opt->{cache_control};
 	$opt->{pragma}        ||= 'no-cache' unless defined $opt->{pragma};
 
-	my $r = Apache->request;
+	my $r = Apache2::RequestUtil->request;
 	$r->content_type($opt->{content_type});
 	$r->header_out('Cache-Control', $opt->{cache_control}) if $opt->{cache_control};
 	$r->header_out('Pragma', $opt->{pragma}) if $opt->{pragma};
@@ -415,7 +416,7 @@ sub redirect {
 	$code = 302 if !$code || $code != 301;
 	my $constants = getCurrentStatic();
 	$url = url2abs($url);
-	my $r = Apache->request;
+	my $r = Apache2::RequestUtil->request;
 
 	$r->content_type($constants->{content_type_webpage} || 'text/html');
 	$r->header_out(Location => $url);
@@ -430,7 +431,7 @@ sub redirect {
 sub emit404 {
 	my $form = getCurrentForm();
 
-        my $r = Apache->request;
+        my $r = Apache2::RequestUtil->request;
         $r->status(404);
 
 	$ENV{REQUEST_URI} ||= '';

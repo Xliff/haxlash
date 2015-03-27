@@ -17,7 +17,7 @@ require SOAP::Transport::HTTP;
 
 #################################################################
 sub main {
-	my $r = Apache->request;
+	my $r = Apache2::RequestUtil->request;
 
 	if (my $action = $r->header_in('SOAPAction')) {
 		# check access controls, get proper dispatch name

@@ -334,7 +334,7 @@ my $start_time = Time::HiRes::time;
 
 }
 
-# Slash::Apache::User can turn a "/" request into an index.pl request
+# Slash::Apache2::User can turn a "/" request into an index.pl request
 # if the user has index_classic set or the user-agent is MSIE 6.
 # So, since this already is index.pl, be sure not to redirect to
 # "/" if either of those things is true, since that would be an
@@ -368,7 +368,7 @@ sub redirect_home_if_necessary {
 		# (If we've determined the user needs to go to
 		# index2.pl, send them there.)  Note that
 		# $form->{returnto} is processed by
-		# Slash::Apache::User::handler, which for reasons
+		# Slash::Apache2::User::handler, which for reasons
 		# of a mysterious bug defers the actual redirect
 		# to be handled by this script.
 		$script = $form->{returnto} || '/';

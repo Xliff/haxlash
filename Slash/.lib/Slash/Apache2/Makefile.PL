@@ -1,4 +1,4 @@
-package Slash::Apache;
+package Slash::Apache2;
 use ExtUtils::MakeMaker;
 
 #Kinda weird looking ain't it? -Brian

@@ -25,6 +25,7 @@ LONG DESCRIPTION.
 
 use strict;
 #use Apache::ModuleConfig;
+use Apache2::RequestUtil ();
 use Digest::MD5 'md5_hex';
 use Time::HiRes;
 use Slash::Constants ();
@@ -240,7 +241,7 @@ sub getCurrentMenu {
 			($menu = $ENV{SCRIPT_NAME}) =~ s/\.pl$//;
 		}
 
-		my $r = Apache->request;
+		my $r = Apache2::RequestUtil->request;
 		my $cfg = Apache::ModuleConfig->get($r, 'Slash::Apache');
 
 		return unless $cfg->{menus}{$menu};
@@ -291,7 +292,7 @@ sub getCurrentUser {
 	my($value) = @_;
 	my $user;
 
-	if ($ENV{GATEWAY_INTERFACE} && (my $r = Apache->request)) {
+	if ($ENV{GATEWAY_INTERFACE} && (my $r = Apache2::RequestUtil->request)) {
 		my $cfg = Apache::ModuleConfig->get($r, 'Slash::Apache');
 		$user = $cfg->{user} ||= {};
 	} else {
@@ -337,7 +338,7 @@ sub setCurrentUser {
 	my $user;
 
 	if ($ENV{GATEWAY_INTERFACE}) {
-		my $r = Apache->request;
+		my $r = Apache2::RequestUtil->request;
 		my $cfg = Apache::ModuleConfig->get($r, 'Slash::Apache');
 		$user = $cfg->{'user'};
 	} else {
@@ -382,7 +383,7 @@ sub setCurrentForm {
 	my $form;
 
 	if ($ENV{GATEWAY_INTERFACE}) {
-		my $r = Apache->request;
+		my $r = Apache2::RequestUtil->request;
 		my $cfg = Apache::ModuleConfig->get($r, 'Slash::Apache');
 		$form = $cfg->{'form'};
 	} else {
@@ -423,7 +424,7 @@ sub createCurrentUser {
 
 	$user ||= {};
 
-	if ($ENV{GATEWAY_INTERFACE} && (my $r = Apache->request)) {
+	if ($ENV{GATEWAY_INTERFACE} && (my $r = Apache2::RequestUtil->request)) {
 		my $cfg = Apache::ModuleConfig->get($r, 'Slash::Apache');
 		$cfg->{'user'} = $user;
 	} else {
@@ -462,7 +463,7 @@ sub getCurrentForm {
 	my($value) = @_;
 	my $form;
 
-	if ($ENV{GATEWAY_INTERFACE} && (my $r = Apache->request)) {
+	if ($ENV{GATEWAY_INTERFACE} && (my $r = Apache2::RequestUtil->request)) {
 		my $cfg = Apache::ModuleConfig->get($r, 'Slash::Apache');
 		$form = $cfg->{'form'};
 	} else {
@@ -504,7 +505,7 @@ sub createCurrentForm {
 	$form ||= {};
 
 	if ($ENV{GATEWAY_INTERFACE}) {
-		my $r = Apache->request;
+		my $r = Apache2::RequestUtil->request;
 		my $cfg = Apache::ModuleConfig->get($r, 'Slash::Apache');
 		$cfg->{'form'} = $form;
 	} else {
@@ -545,7 +546,7 @@ sub getCurrentCookie {
 	my $cookie;
 
 	if ($ENV{GATEWAY_INTERFACE}) {
-		my $r = Apache->request;
+		my $r = Apache2::RequestUtil->request;
 		my $cfg = Apache::ModuleConfig->get($r, 'Slash::Apache');
 		$cookie = $cfg->{'cookie'};
 	} else {
@@ -587,7 +588,7 @@ sub createCurrentCookie {
 	$cookie ||= {};
 
 	if ($ENV{GATEWAY_INTERFACE}) {
-		my $r = Apache->request;
+		my $r = Apache2::RequestUtil->request;
 		my $cfg = Apache::ModuleConfig->get($r, 'Slash::Apache');
 		$cfg->{'cookie'} = $cookie;
 	} else {
@@ -627,7 +628,7 @@ sub getCurrentSkin {
 
 	my $current_skin;
 	if ($ENV{GATEWAY_INTERFACE}) {
-		my $r = Apache->request;
+		my $r = Apache2::RequestUtil->request;
 		my $cfg = Apache::ModuleConfig->get($r, 'Slash::Apache');
 		$current_skin = $cfg->{skin}  ||= {};
 	} else {
@@ -670,7 +671,7 @@ sub setCurrentSkin {
 
 	my $current_skin;
 	if ($ENV{GATEWAY_INTERFACE}) {
-		my $r = Apache->request;
+		my $r = Apache2::RequestUtil->request;
 		my $cfg = Apache::ModuleConfig->get($r, 'Slash::Apache');
 		$current_skin = $cfg->{skin} ||= {};
 	} else {
@@ -749,7 +750,7 @@ sub getCurrentStatic {
 
 	my $constants;
 
-	if ($ENV{GATEWAY_INTERFACE} && (my $r = Apache->request)) {
+	if ($ENV{GATEWAY_INTERFACE} && (my $r = Apache2::RequestUtil->request)) {
 		my $const_cfg = Apache::ModuleConfig->get($r, 'Slash::Apache');
 		$constants = $want_secure
 			? $const_cfg->{constants_secure} : $const_cfg->{constants};
@@ -857,7 +858,7 @@ sub getCurrentAnonymousCoward {
 
 	my $ref;
 	if ($ENV{GATEWAY_INTERFACE}) {
-		my $r = Apache->request;
+		my $r = Apache2::RequestUtil->request;
 		my $const_cfg = Apache::ModuleConfig->get($r, 'Slash::Apache') or return;
 		$ref = $const_cfg->{anonymous_coward};
 	} else {
@@ -918,7 +919,7 @@ The current virtual user that the site is running under.
 =cut
 
 sub getCurrentVirtualUser {
-	if ($ENV{GATEWAY_INTERFACE} && (my $r = Apache->request)) {
+	if ($ENV{GATEWAY_INTERFACE} && (my $r = Apache2::RequestUtil->request)) {
 		my $cfg = Apache::ModuleConfig->get($r, 'Slash::Apache');
 		return $cfg->{'VirtualUser'};
 	} else {
@@ -976,7 +977,7 @@ Returns the current Slash::DB object.
 sub getCurrentDB {
 	my $slashdb;
 
-	if ($ENV{GATEWAY_INTERFACE} && (my $r = Apache->request)) {
+	if ($ENV{GATEWAY_INTERFACE} && (my $r = Apache2::RequestUtil->request)) {
 		my $const_cfg = Apache::ModuleConfig->get($r, 'Slash::Apache');
 		$slashdb = $const_cfg->{slashdb};
 	} else {
@@ -1334,7 +1335,7 @@ sub setCookie {
 	my($name, $val, $session) = @_;
 	return unless $name;
 
-	my $r = Apache->request;
+	my $r = Apache2::RequestUtil->request;
 	my $constants = getCurrentStatic();
 	my $gSkin = getCurrentSkin();
 
@@ -1364,7 +1365,7 @@ sub setCookie {
 	);
 
 	$cookiehash{-secure} = 1
-		if $constants->{cookiesecure} && Slash::Apache::ConnectionIsSSL();
+		if $constants->{cookiesecure} && Slash::Apache2::ConnectionIsSSL();
 
 	my $cookie = Apache::Cookie->new($r, %cookiehash);
 
@@ -1492,7 +1493,7 @@ sub userLogout {
 =head2 prepareUser(UID, FORM, URI [, COOKIES])
 
 This is called to initialize the user.  It is called from
-Slash::Apache::User::handler, and from createEnvironment (so it
+Slash::Apache2::User::handler, and from createEnvironment (so it
 can set up a user in "command line" mode).  See those two functions
 to see how to call this function in each kind of environment.
 
@@ -1551,7 +1552,7 @@ sub prepareUser {
 
 	my $r;
 	if ($ENV{GATEWAY_INTERFACE}) {
-		$r = Apache->request;
+		$r = Apache2::RequestUtil->request;
 		$hostip = $r->connection->remote_ip;
 	} else {
 		$hostip = '';
@@ -1806,7 +1807,7 @@ print STDERR scalar(localtime) . " Env.pm $$ userHasDaypass uid=$user->{uid} cs=
 		$slashdb->getSessionInstance($uid);
 
 		if ($constants->{admin_check_clearpass}
-			&& !Slash::Apache::ConnectionIsSecure()) {
+			&& !Slash::Apache2::ConnectionIsSecure()) {
 			$user->{state}{admin_clearpass_thisclick} = 1;
 		}
 	}
@@ -2444,7 +2445,7 @@ sub getObject {
 	$vuser ||= $user->{state}{dbs}{writer} || getCurrentVirtualUser();
 	return undef unless $vuser && $class;
 
-	if ($ENV{GATEWAY_INTERFACE} && (my $r = Apache->request)) {
+	if ($ENV{GATEWAY_INTERFACE} && (my $r = Apache2::RequestUtil->request)) {
 		$cfg     = Apache::ModuleConfig->get($r, 'Slash::Apache');
 		$objects = $cfg->{'objects'} ||= {};
 	} else {
@@ -2615,7 +2616,7 @@ sub errorLog {
 		push @errors, "Which was called by:$package:$filename:$line";
 	}
 
-	if ($ENV{GATEWAY_INTERFACE} && (my $r = Apache->request)) {
+	if ($ENV{GATEWAY_INTERFACE} && (my $r = Apache2::RequestUtil->request)) {
 		$errors[0] = $ENV{SCRIPT_NAME} . $errors[0];
 		#$errors[-1] .= "\n";
 		$r->log_error(join ' ;; ', @errors); # for @errors;
@@ -2644,7 +2645,7 @@ sub writeLog {
 	my @args = grep { defined $_ } @_;
 	my $dat = @args ? join("\t", @args) : '';
 
-	my $r = Apache->request;
+	my $r = Apache2::RequestUtil->request;
 
 	# Notes has a bug (still in apache 1.3.17 at
 	# last look). Apache's directory sub handler
@@ -2663,7 +2664,7 @@ sub getOpAndDatFromStatusAndURI {
 	if ($status == 302) {
 		# See mod_relocate -Brian
 		if ($uri =~ /\.relo$/) {
-			my $apr = Apache::Request->new(Apache->request);
+			my $apr = Apache::Request->new(Apache2::RequestUtil->request);
 			$dat = $apr->param('_URL');
 			$uri = 'relocate';
 		} else  {
@@ -2753,7 +2754,7 @@ sub createLog {
 	my $constants = getCurrentStatic();
 
 	# At this point, if we have short-circuited the
-	# "PerlAccessHandler  Slash::Apache::User"
+	# "PerlAccessHandler  Slash::Apache2::User"
 	# by returning an apache code like DONE before that processing
 	# could take place (which currently happens in Banlist.pm), then
 	# prepareUser() has not been called, thus the $user->{state}{dbs}
@@ -2900,7 +2901,7 @@ sub determineCurrentSkin {
 	my $reader = getObject('Slash::DB', { db_type => 'reader' });
 	my $skin;
 
-	if ($ENV{GATEWAY_INTERFACE} && (my $r = Apache->request)) {
+	if ($ENV{GATEWAY_INTERFACE} && (my $r = Apache2::RequestUtil->request)) {
 		my $hostname = $r->header_in('host') || '';
 		$hostname =~ s/:\d+$//;
  
@@ -2945,7 +2946,7 @@ sub get_ipids {
 	$locationid = getCurrentStatic('cookie_location') if @_ > 2 && !$locationid;
  
 	if (!$hostip && $ENV{GATEWAY_INTERFACE}) {
-		my $r = Apache->request;
+		my $r = Apache2::RequestUtil->request;
 		$hostip = $r->connection->remote_ip;
 	} elsif (!$hostip) {
 		$hostip = '';
@@ -3054,7 +3055,7 @@ sub get_srcids {
 		}
 		if (!$ip) {
 			if ($ENV{GATEWAY_INTERFACE}) {
-				my $r = Apache->request;
+				my $r = Apache2::RequestUtil->request;
 				$ip = $r->connection->remote_ip;
 			} elsif (!$ip) {
 				$ip = '0.0.0.0';
@@ -3455,8 +3456,8 @@ Secure HTTP as defined in Slash::Apache.
 #my $cached_value = undef;
 sub apacheConnectionSSL {
 #	return $cached_value if defined($cached_value);
-	my $retval = defined &Slash::Apache::ConnectionIsSSL
-		&& Slash::Apache::ConnectionIsSSL();
+	my $retval = defined &Slash::Apache2::ConnectionIsSSL
+		&& Slash::Apache2::ConnectionIsSSL();
 #	$cached_value = $retval if $ENV{GATEWAY_INTERFACE};
 	return $retval;
 }
@@ -3605,7 +3606,7 @@ sub getCurrentCache {
 	my($value) = @_;
 	my $cache;
 
-	if ($ENV{GATEWAY_INTERFACE} && (my $r = Apache->request)) {
+	if ($ENV{GATEWAY_INTERFACE} && (my $r = Apache2::RequestUtil->request)) {
 		my $cfg = Apache::ModuleConfig->get($r, 'Slash::Apache');
 		$cache = $cfg->{'cache'} ||= {};
 	} else {

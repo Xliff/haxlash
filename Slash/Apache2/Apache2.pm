@@ -7,6 +7,7 @@ package Slash::Apache2;
 use strict;
 use Time::HiRes;
 use Apache2;
+use Apache2::RequestUtil;
 #use Apache2::SIG ();
 #use Apache2::ModuleConfig;
 use Apache2::Const -compile => qw(:common);
@@ -303,7 +304,7 @@ sub ConnectionIsSSL {
 	return 1 if $ENV{SSL_SESSION_ID};
 
 	# That probably didn't work so let's get that data the hard way.
-	my $r = Apache->request;
+	my $r = Apache2::RequestUtil->request;
 	return 0 if !$r;
 
 	my $x = $r->header_in('X-SFINC-SSL');
@@ -332,7 +333,7 @@ sub ConnectionIsSecure {
 	# secure by the admin, it's secure.  (The too-clever-by-half
 	# way of doing this would be to check this machine's routing
 	# tables.  Instead we have the admins set a regex in a var.)
-	my $r = Apache->request;
+	my $r = Apache2::RequestUtil->request;
 	my $ip = $r->connection->remote_ip;
 	my $constants = getCurrentStatic();
 	my $secure_ip_regex = $constants->{admin_secure_ip_regex};
@@ -685,7 +686,7 @@ Slash::Apache - Apache Specific handler for Slash
 
 =head1 SYNOPSIS
 
-	use Slash::Apache;
+	use Slash::Apache2;
 
 =head1 DESCRIPTION
 

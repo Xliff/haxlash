@@ -2,7 +2,7 @@
 # Copyright 1997-2005 by Open Source Technology Group. See README
 # and COPYING for more information, or see http://slashcode.com/.
 
-package Slash::Apache::Log;
+package Slash::Apache2::Log;
 
 use strict;
 use Slash::Utility;
@@ -163,11 +163,11 @@ __END__
 
 =head1 NAME
 
-Slash::Apache::Log - Handles logging for slashdot
+Slash::Apache2::Log - Handles logging for slashdot
 
 =head1 SYNOPSIS
 
-	use Slash::Apache::Log;
+	use Slash::Apache2::Log;
 
 =head1 DESCRIPTION
 

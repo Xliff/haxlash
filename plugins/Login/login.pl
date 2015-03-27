@@ -5,7 +5,9 @@
 # $Id$
 
 use strict;
-use Slash 2.003;
+
+#use Slash 2.003;
+use Slash;
 use Slash::Constants qw(:web :messages);
 use Slash::Display;
 use Slash::Utility;
@@ -45,7 +47,7 @@ sub main {
 	}
 
 	# you are logged in, just go to your prefs (you were authenticated
-	# in Slash::Apache::User, before you got here)
+	# in Slash::Apache2::User, before you got here)
 	if ($op eq 'userlogin' && $user_ok) {
 		redirect(cleanRedirectUrl($form->{returnto}));
 		return;
@@ -312,7 +314,7 @@ sub _sendMailPasswd {
 	# Note that we strip the forgeable ones to make sure there
 	# aren't any "<>" chars which could fool a stupid mail client
 	# into parsing a plaintext email as HTML.
-	my $r = Apache->request;
+	my $r = Apache2::RequestUtil->request;
 	my $remote_ip = $r->connection->remote_ip;
 
 	my $xff = $r->header_in('X-Forwarded-For') || '';

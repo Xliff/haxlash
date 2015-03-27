@@ -44,7 +44,7 @@ sub main {
 	$op = 'basic' if !$form->{op} && !$form->{url};
 
 	if ( !$ops->{$op}{noheader} ) {
-		my $r = Apache->request;
+		my $r = Apache2::RequestUtil->request;
 		$r->content_type('text/html');
 		$r->header_out('Cache-Control', 'no-cache');
 		$r->send_http_header;

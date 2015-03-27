@@ -409,7 +409,7 @@ find(sub {
 
 # do syntax checks of modules
 for ('Slash::Constants', 'Slash::Utility', 'Slash::Utility::Access',
-	'Slash::Apache', 'Slash::Apache', 'Slash::Apache::User',
+	'Slash::Apache2', 'Slash::Apache2', 'Slash::Apache2::User',
 	'Slash::SearchToo::KinoSearch', 'Slash',
 	'Slash::XML', 'Slash::Custom::Bulkmail', 'Slash::XML::OAI') {
 	syntax_check(pmpath($_)) or warn $@;

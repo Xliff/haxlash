@@ -31,7 +31,7 @@ sub main {
 #		#require XML::OCS;
 #		#my $all = $feed->getActive();
 #		my $all = $yass->getActive();
-#		my $r = Apache->request;
+#		my $r = Apache2::RequestUtil->request;
 #		$r->header_out('Cache-Control', 'private');
 #		$r->content_type('text/xml');
 #		$r->status(200);

@@ -5,13 +5,13 @@
 # This Apache handler massages existing .shtml files to give them a
 # modern (2009) header and footer.
 
-package Slash::Apache::Shtml;
+package Slash::Apache2::Shtml;
 
 use strict;
 
 use Apache2;
 use Apache2::Const qw(:common);
-use Apache2::Request ();
+use Apache2::RequestUtil ();
 #use Slash::Apache2 ();
 use Slash::Utility;
 
@@ -24,7 +24,7 @@ sub handler {
 
 	return DECLINED unless $r->is_initial_req;
 
-	Apache->request($r);
+	Apache2::RequestUtil->request($r);
 	my $uri = $r->uri;
 
 	# Only .shtml URLs are processed by this handler.

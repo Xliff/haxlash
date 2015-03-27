@@ -1298,7 +1298,7 @@ sub createAccessLog {
 	my $constants = getCurrentStatic();
 	my $form = getCurrentForm();
 	my $user = getCurrentUser();
-	my $r = Apache->request;
+	my $r = Apache2::RequestUtil->request;
 	my $bytes = $r->bytes_sent;
 
 	$user ||= {};
@@ -1364,9 +1364,9 @@ sub createAccessLog {
 	}
 
 	my $duration;
-	if ($Slash::Apache::User::request_start_time) {
-		$duration = Time::HiRes::time - $Slash::Apache::User::request_start_time;
-		$Slash::Apache::User::request_start_time = 0;
+	if ($Slash::Apache2::User::request_start_time) {
+		$duration = Time::HiRes::time - $Slash::Apache2::User::request_start_time;
+		$Slash::Apache2::User::request_start_time = 0;
 		$duration = 0 if $duration < 0; # sanity check
 	} else {
 		$duration = 0;
@@ -1442,7 +1442,7 @@ sub createAccessLogAdmin {
 	my $constants = getCurrentStatic();
 	my $form = getCurrentForm();
 	my $user = getCurrentUser();
-	my $r = Apache->request;
+	my $r = Apache2::RequestUtil->request;
 
 	# $ENV{SLASH_USER} wasn't working, was giving us some failed inserts
 	# with uid NULL.
@@ -1472,7 +1472,7 @@ sub createAccessLogAdmin {
 		-ts		=> 'NOW()',
 		query_string	=> $ENV{QUERY_STRING} ? $self->truncateStringForCharColumn($ENV{QUERY_STRING}, 'accesslog_admin', 'query_string') : '0',
 		user_agent	=> $ENV{HTTP_USER_AGENT} ? $self->truncateStringForCharColumn($ENV{HTTP_USER_AGENT}, 'accesslog_admin', 'user_agent') : 'undefined',
-		secure		=> Slash::Apache::ConnectionIsSecure(),
+		secure		=> Slash::Apache2::ConnectionIsSecure(),
 		status		=> $status,
 	}, { delayed => 1 });
 }
@@ -1745,7 +1745,7 @@ sub createBadPasswordLog {
 
 	# Bad passwords that don't come through the web,
 	# we don't bother to log.
-	my $r = Apache->request;
+	my $r = Apache2::RequestUtil->request;
 	return unless $r;
 
 	# We also store the realemail field of the actual user account
@@ -4563,7 +4563,7 @@ sub setKnownOpenProxy {
 	return 0 unless $ip;
 	my $xff;
 	if ($port) {
-		my $r = Apache->request;
+		my $r = Apache2::RequestUtil->request;
 		$xff = $r->header_in('X-Forwarded-For') if $r;
 #use Data::Dumper; print STDERR "sKOP headers_in: " . Dumper([ $r->headers_in ]) if $r;
 	}
@@ -4587,7 +4587,7 @@ sub checkForOpenProxy {
 	# If we weren't passed an IP address, default to whatever
 	# the current IP address is.
 	if (!$ip && $ENV{GATEWAY_INTERFACE}) {
-		my $r = Apache->request;
+		my $r = Apache2::RequestUtil->request;
 		$ip = $r->connection->remote_ip if $r;
 	}
 	# If we don't have an IP address, it can't be an open proxy.
@@ -8362,7 +8362,7 @@ sub _getSlashConf_rawvars {
 
 ########################################################
 # Now, the idea is to not cache here, since we actually
-# cache elsewhere (namely in %Slash::Apache::constants) - Brian
+# cache elsewhere (namely in %Slash::Apache2::constants) - Brian
 # I'm caching this in memcached now though. - Jamie
 sub getSlashConf {
 	my($self, $secure) = @_;
@@ -8408,7 +8408,7 @@ sub getSlashConf {
 	$conf{absolutedir_secure} ||= $conf{absolutedir};
 	$conf{imagedir_secure}	||= $conf{imagedir};
 	$conf{css_extension}      = 'css';
-#	if (defined &Slash::Apache::ConnectionIsSSL && Slash::Apache::ConnectionIsSSL())
+#	if (defined &Slash::Apache2::ConnectionIsSSL && Slash::Apache2::ConnectionIsSSL())
 	if ($secure) {
 		# On Secure HTTP connections, force absolutedir/imagedir to
 		# be the secure versions.
@@ -11126,7 +11126,7 @@ sub getUser {
 			}
 			# And adjust the users_hits.lastclick value, a timestamp,
 			# to work the same in 4.1 and later as it did in 4.0.
-			# This is vital to make a Slash::Apache::Log::UserLog
+			# This is vital to make a Slash::Apache2::Log::UserLog
 			# test work properly.  See also updateLastaccess.
 			$answer->{lastclick} =~ s/\D+//g if $answer->{lastclick};
 #			for my $duple (@$users_param) {
@@ -11377,7 +11377,7 @@ sub _getUser_do_selects {
 	}
 	# And adjust the users_hits.lastclick value, a timestamp,
 	# to work the same in 4.1 and later as it did in 4.0.
-	# This is vital to make a Slash::Apache::Log::UserLog
+	# This is vital to make a Slash::Apache2::Log::UserLog
 	# test work properly.  See also updateLastaccess.
 	$answer->{lastclick} =~ s/\D+//g if $answer->{lastclick};
 

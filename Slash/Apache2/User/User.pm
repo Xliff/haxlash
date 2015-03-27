@@ -9,6 +9,7 @@ use Digest::MD5 'md5_hex';
 use Time::HiRes;
 use Apache2;
 use Apache2::Const qw(:common M_GET REDIRECT);
+use Apache2::RequestUtil ();
 #use Apache::Cookie;
 #use Apache::Request ();
 #use Apache::File;
@@ -50,8 +51,8 @@ sub handler {
 
 	$request_start_time ||= Time::HiRes::time;
 
-	# Ok, this will make it so that we can reliably use Apache->request
-	Apache->request($r);
+	# Ok, this will make it so that we can reliably use Apache2::RequestUtil->request
+	Apache2::RequestUtil->request($r);
 
 	my $cfg = Apache::ModuleConfig->get($r);
 	my $dbcfg = Apache::ModuleConfig->get($r, 'Slash::Apache');
@@ -80,7 +81,7 @@ sub handler {
 		$uri =~ s/^\Q$path//;
 	}
 
-	my $is_ssl = Slash::Apache::ConnectionIsSSL();
+	my $is_ssl = Slash::Apache2::ConnectionIsSSL();
 
 	$slashdb->sqlConnect;
 	$reader->sqlConnect;
@@ -1011,11 +1012,11 @@ __END__
 
 =head1 NAME
 
-Slash::Apache::User - Apache Authenticate for Slash user
+Slash::Apache2::User - Apache Authenticate for Slash user
 
 =head1 SYNOPSIS
 
-	use Slash::Apache::User;
+	use Slash::Apache2::User;
 
 =head1 DESCRIPTION
 

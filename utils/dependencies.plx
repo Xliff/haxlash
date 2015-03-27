@@ -128,18 +128,18 @@ my %data = (
 		Slash::Display
 		Slash::Utility
 	)],
-	'Slash::Apache' => [qw(
+	'Slash::Apache2' => [qw(
 		Slash
 		Slash::DB
 		Slash::Display
 		Slash::Utility
 	)],
-	'Slash::Apache::Log' => [qw(
+	'Slash::Apache2::Log' => [qw(
 		Slash::Utility
 	)],
-	'Slash::Apache::User' => [qw(
+	'Slash::Apache2::User' => [qw(
 		Slash
-		Slash::Apache
+		Slash::Apache2
 		Slash::Display
 		Slash::Utility
 	)],

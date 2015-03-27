@@ -8,6 +8,7 @@ package Slash::Apache2::Banlist;
 
 use strict;
 use Apache2::Constants qw(:common);
+use Apache2::RequestUtil ();
 
 use Slash;
 use Slash::Display;
@@ -23,8 +24,8 @@ sub handler {
 
 	$Slash::Apache2::User::request_start_time ||= Time::HiRes::time;
 
-	# Ok, this will make it so that we can reliably use Apache->request
-	Apache->request($r);
+	# Ok, this will make it so that we can reliably use Apache2::RequestUtil->request
+	Apache2::RequestUtil->request($r);
 
 	# Get some information about the IP this request is coming from.
 	my $hostip = $r->connection->remote_ip;

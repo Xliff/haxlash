@@ -44,7 +44,9 @@ use Slash::Display::Provider ();
 use Slash::Utility::Data;
 use Slash::Utility::Environment;
 use Slash::Utility::System;
-use Template 2.07;
+
+#use Template 2.07;
+use Template;
 
 use base 'Exporter';
 use vars qw($CONTEXT %FILTERS $TEMPNAME);
@@ -375,7 +377,7 @@ sub get_template {
 
 	# think more on this, consider putting it in
 	# Slash::Utility::Environment -- pudge
-	if ($ENV{GATEWAY_INTERFACE} && (my $r = Apache->request)) {
+	if ($ENV{GATEWAY_INTERFACE} && (my $r = Apache2::RequestUtil->request)) {
 		$cfg = Apache::ModuleConfig->get($r, 'Slash::Apache');
 		return $cfg->{template} if $cfg->{template};
 	} elsif ($VirtualUser && ref $objects{$VirtualUser}) {

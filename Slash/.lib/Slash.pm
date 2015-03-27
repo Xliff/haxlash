@@ -509,7 +509,7 @@ a data template. A data template is a colletion of data snippets
 in one template, which are grouped together for efficiency. Each
 script can have its own data template (specified by the PAGE
 parameter). If PAGE is unspecified, snippets will be retrieved from
-the last page visited by the user as determined by Slash::Apache::User.
+the last page visited by the user as determined by Slash::Apache2::User.
 
 =item Notes
 

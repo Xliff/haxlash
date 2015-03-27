@@ -2,7 +2,7 @@
 # Copyright 1997-2005 by Open Source Technology Group. See README
 # and COPYING for more information, or see http://slashcode.com/.
 
-package Slash::Apache::User;
+package Slash::Apache2::User;
 
 use strict;
 use Digest::MD5 'md5_hex';
@@ -24,12 +24,12 @@ use vars qw($VERSION @ISA @QUOTES $USER_MATCH $request_start_time);
 @ISA		= qw(DynaLoader);
 $VERSION   	= '2.003000';  # v2.3.0
 
-bootstrap Slash::Apache::User $VERSION;
+bootstrap Slash::Apache2::User $VERSION;
 
 # BENDER: Oh, so, just 'cause a robot wants to kill humans
 # that makes him a radical?
 
-$USER_MATCH = $Slash::Apache::USER_MATCH;
+$USER_MATCH = $Slash::Apache2::USER_MATCH;
 
 sub SlashEnableENV ($$$) {
 	my($cfg, $params, $flag) = @_;
@@ -59,8 +59,8 @@ sub handler {
 
 	$request_start_time ||= Time::HiRes::time;
 
-	# Ok, this will make it so that we can reliably use Apache->request
-	Apache->request($r);
+	# Ok, this will make it so that we can reliably use Apache2::RequestUtil->request
+	Apache2::RequestUtil->request($r);
 
 	my $cfg = Apache::ModuleConfig->get($r);
 	my $dbcfg = Apache::ModuleConfig->get($r, 'Slash::Apache');
@@ -89,7 +89,7 @@ sub handler {
 		$uri =~ s/^\Q$path//;
 	}
 
-	my $is_ssl = Slash::Apache::ConnectionIsSSL();
+	my $is_ssl = Slash::Apache2::ConnectionIsSSL();
 
 	$slashdb->sqlConnect;
 	$reader->sqlConnect;
@@ -1020,11 +1020,11 @@ __END__
 
 =head1 NAME
 
-Slash::Apache::User - Apache Authenticate for Slash user
+Slash::Apache2::User - Apache Authenticate for Slash user
 
 =head1 SYNOPSIS
 
-	use Slash::Apache::User;
+	use Slash::Apache2::User;
 
 =head1 DESCRIPTION
 

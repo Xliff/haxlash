@@ -190,7 +190,7 @@ sub sendMailPasswd {
 
 	my $newpasswd = $slashdb->getNewPasswd($uid);
 
-	my $r = Apache->request;
+	my $r = Apache2::RequestUtil->request;
 	my $remote_ip = $r->connection->remote_ip;
 
 	my $xff = $r->header_in('X-Forwarded-For') || '';

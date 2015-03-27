@@ -46,7 +46,7 @@ use POSIX qw(UINT_MAX);
 use Safe;
 use Slash::Constants qw(:strip);
 use Slash::Utility::Environment;
-use Slash::Apache::User::PasswordSalt;
+use Slash::Apache2::User::PasswordSalt;
 use URI;
 use XML::Parser;
 
@@ -957,7 +957,7 @@ Random password.
 =head2 encryptPassword(PASSWD)
 
 Encrypts given password, using the most recent salt (if any) in
-Slash::Apache::User::PasswordSalt for the current virtual user.
+Slash::Apache2::User::PasswordSalt for the current virtual user.
 Currently uses MD5, but could change in the future, so do not
 depend on the implementation.
 
@@ -986,7 +986,7 @@ sub encryptPassword {
 	$uid ||= '';
 	my $slashdb = getCurrentDB();
 	my $vu = $slashdb->{virtual_user};
-	my $salt = Slash::Apache::User::PasswordSalt::getCurrentPwSalt($vu);
+	my $salt = Slash::Apache2::User::PasswordSalt::getCurrentPwSalt($vu);
 	$passwd = Encode::encode_utf8($passwd) if getCurrentStatic('utf8');
 	return md5_hex("$salt:$uid:$passwd");
 }
@@ -1053,7 +1053,7 @@ sub comparePassword {
 		# No?  OK let's see if it matches any of the salts.
 		my $slashdb = getCurrentDB();
 		my $vu = $slashdb->{virtual_user};
-		my $salt_ar = Slash::Apache::User::PasswordSalt::getPwSalts($vu);
+		my $salt_ar = Slash::Apache2::User::PasswordSalt::getPwSalts($vu);
 		unshift @$salt_ar, ''; # always test the case of no salt
 		for my $salt (reverse @$salt_ar) {
 			# The current way of encrypting a user's password.

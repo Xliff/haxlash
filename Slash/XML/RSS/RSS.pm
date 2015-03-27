@@ -169,7 +169,7 @@ sub create {
 	# A convenient way to tell whether our caller is apache.
 	# Seems like there should be a better-supported way, but this
 	# way is convenient.
-	my $dynamic = defined &Slash::Apache::ConnectionIsSSL;
+	my $dynamic = defined &Slash::Apache2::ConnectionIsSSL;
 	my $absolutedir = apacheConnectionSSL() ? $gSkin->{absolutedir_secure} : $gSkin->{absolutedir};
 
 	# set defaults

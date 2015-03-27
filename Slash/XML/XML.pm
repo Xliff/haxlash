@@ -23,7 +23,8 @@ Slash::XML aids in creating XML.  Right now, only RSS is supported.
 =cut
 
 use strict;
-use Apache::Constants ':http';
+use Apache2::Const qw(:http);
+use Apache2::RequestUtil ();
 use Digest::MD5 'md5_hex';
 use Encode 'encode_utf8';
 use Time::Local;
@@ -131,7 +132,7 @@ sub xmlDisplay {
 	if ($opt->{Return}) {
 		return $content;
 	} else {
-		my $r = Apache->request;
+		my $r = Apache2::RequestUtil->request;
 		my $content_type = 'text/xml';
 		my $suffix = 'xml';
 

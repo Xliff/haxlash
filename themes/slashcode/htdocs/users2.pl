@@ -627,7 +627,7 @@ sub mailPasswd {
 	# Note that we strip the forgeable ones to make sure there
 	# aren't any "<>" chars which could fool a stupid mail client
 	# into parsing a plaintext email as HTML.
-	my $r = Apache->request;
+	my $r = Apache2::RequestUtil->request;
 	my $remote_ip = $r->connection->remote_ip;
 	my $xff = $r->header_in('X-Forwarded-For') || '';
 	$xff =~ s/\s+/ /g;
