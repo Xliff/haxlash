@@ -31,15 +31,6 @@ $VERSION   	= '2.003000';  # v2.3.0
 
 $USER_MATCH = $Slash::Apache2::USER_MATCH;
 
-sub SlashEnableENV ($$$) {
-	my($cfg, $params, $flag) = @_;
-	$cfg->{env} = $flag;
-}
-
-sub SlashAuthAll ($$$) {
-	my($cfg, $params, $flag) = @_;
-	$cfg->{auth} = $flag;
-}
 
 # see below for more info on this var
 my $srand_called;
@@ -134,7 +125,7 @@ sub handler {
 	$form->{query_apache} = $apr;
 	@{$form}{keys  %{$constants->{form_override}}} =
 		values %{$constants->{form_override}};
-	my $cookies = Apache::Cookie->fetch;
+	my $cookies = Apache::Cookie->fetch($r);
 
 	# So we are either going to pick the user up from
 	# the form, a cookie, or they will be anonymous

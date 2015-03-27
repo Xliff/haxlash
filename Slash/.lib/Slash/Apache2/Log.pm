@@ -2,21 +2,21 @@
 # Copyright 1997-2005 by Open Source Technology Group. See README
 # and COPYING for more information, or see http://slashcode.com/.
 
-package Slash::Apache::Log;
+package Slash::Apache2::Log;
 
 use strict;
 use Slash::Utility;
-use Apache2::Const qw(:common);
+use Apache2::Constants qw(:common);
 
 our $VERSION = $Slash::Constants::VERSION;
 
 # AMY: Leela's gonna kill me.
 # BENDER: Naw, she'll probably have me do it.
 
-# Note regarding Apache::DBI:
-# Slash does not use Apache::DBI (it's just an extra, unnecessary,
+# Note regarding Apache2::DBI:
+# Slash does not use Apache2::DBI (it's just an extra, unnecessary,
 # layer of dbh caching).  However, some sites may use it, perhaps for
-# other database-backed projects on the same web server.  Apache::DBI
+# other database-backed projects on the same web server.  Apache2::DBI
 # pushes a PerlCleanupHandler with every created dbh, to roll back
 # any open transactions.  The docs for Apache.pm say a handler added
 # with push_handlers will be called "before any configured handlers,"
@@ -163,11 +163,11 @@ __END__
 
 =head1 NAME
 
-Slash::Apache::Log - Handles logging for slashdot
+Slash::Apache2::Log - Handles logging for slashdot
 
 =head1 SYNOPSIS
 
-	use Slash::Apache::Log;
+	use Slash::Apache2::Log;
 
 =head1 DESCRIPTION
 

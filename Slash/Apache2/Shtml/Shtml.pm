@@ -8,10 +8,11 @@
 package Slash::Apache::Shtml;
 
 use strict;
-use Apache;
-use Apache::Constants qw(:common);
-use Apache::Request ();
-use Slash::Apache ();
+
+use Apache2;
+use Apache2::Const qw(:common);
+use Apache2::Request ();
+#use Slash::Apache2 ();
 use Slash::Utility;
 
 use vars qw($VERSION @ISA);

@@ -2,13 +2,13 @@
 # Copyright 1997-2005 by Open Source Technology Group. See README
 # and COPYING for more information, or see http://slashcode.com/.
 
-package Slash::Apache;
+package Slash::Apache2;
 
 use strict;
 use Time::HiRes;
-use Bundle::Apache2;
-#use Apache::SIG ();
-#use Apache::ModuleConfig;
+use Apache2;
+#use Apache2::SIG ();
+#use Apache2::ModuleConfig;
 use Apache2::Const -compile => qw(:common);
 use Slash::DB;
 use Slash::Display;

@@ -1,5 +1,4 @@
-Apache.pm
-Apache.xs
+Apache2.pm
 Changes
 MANIFEST
 Makefile.PL

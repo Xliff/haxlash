@@ -2,44 +2,35 @@
 # Copyright 1997-2005 by Open Source Technology Group. See README
 # and COPYING for more information, or see http://slashcode.com/.
 
-package Slash::Apache::User;
+package Slash::Apache2::User;
 
 use strict;
 use Digest::MD5 'md5_hex';
 use Time::HiRes;
-use Apache;
-use Apache::Constants qw(:common M_GET REDIRECT);
-use Apache::Cookie;
-use Apache::Request ();
-use Apache::File;
-use Apache::ModuleConfig;
-use AutoLoader ();
-use DynaLoader ();
-use Slash::Apache ();
+use Apache2;
+use Apache2::Const qw(:common M_GET REDIRECT);
+#use Apache::Cookie;
+#use Apache::Request ();
+#use Apache::File;
+#use Apache::ModuleConfig;
+#use AutoLoader ();
+#use DynaLoader ();
+use Slash::Apache2;
 use Slash::Display;
 use Slash::Utility;
 use URI ();
 use vars qw($VERSION @ISA @QUOTES $USER_MATCH $request_start_time);
 
-@ISA		= qw(DynaLoader);
+#@ISA		= qw(DynaLoader);
 $VERSION   	= '2.003000';  # v2.3.0
 
-bootstrap Slash::Apache::User $VERSION;
+#bootstrap Slash::Apache2::User $VERSION;
 
 # BENDER: Oh, so, just 'cause a robot wants to kill humans
 # that makes him a radical?
 
-$USER_MATCH = $Slash::Apache::USER_MATCH;
+$USER_MATCH = $Slash::Apache2::USER_MATCH;
 
-sub SlashEnableENV ($$$) {
-	my($cfg, $params, $flag) = @_;
-	$cfg->{env} = $flag;
-}
-
-sub SlashAuthAll ($$$) {
-	my($cfg, $params, $flag) = @_;
-	$cfg->{auth} = $flag;
-}
 
 # see below for more info on this var
 my $srand_called;
@@ -134,7 +125,7 @@ sub handler {
 	$form->{query_apache} = $apr;
 	@{$form}{keys  %{$constants->{form_override}}} =
 		values %{$constants->{form_override}};
-	my $cookies = Apache::Cookie->fetch;
+	my $cookies = Apache::Cookie->fetch($r);
 
 	# So we are either going to pick the user up from
 	# the form, a cookie, or they will be anonymous

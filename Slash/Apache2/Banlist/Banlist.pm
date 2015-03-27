@@ -4,10 +4,10 @@
 
 # This handler is called in the fourth Apache phase, access control.
 
-package Slash::Apache::Banlist;
+package Slash::Apache2::Banlist;
 
 use strict;
-use Apache::Constants qw(:common);
+use Apache2::Constants qw(:common);
 
 use Slash;
 use Slash::Display;
@@ -21,7 +21,7 @@ sub handler {
 
 	return DECLINED unless $r->is_main;
 
-	$Slash::Apache::User::request_start_time ||= Time::HiRes::time;
+	$Slash::Apache2::User::request_start_time ||= Time::HiRes::time;
 
 	# Ok, this will make it so that we can reliably use Apache->request
 	Apache->request($r);
@@ -184,11 +184,11 @@ __END__
 
 =head1 NAME
 
-Slash::Apache::Banlist- Handles user banning via ipid 
+Slash::Apache2::Banlist- Handles user banning via ipid 
 
 =head1 SYNOPSIS
 
-	use Slash::Apache::Banlist;
+	use Slash::Apache2::Banlist;
 
 =head1 DESCRIPTION
 

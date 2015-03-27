@@ -16,15 +16,6 @@ use Slash::Display;
 use Slash::Utility;
 use URI;
 
-use vars qw($VERSION $USER_MATCH $DAYPASS_MATCH);
-
-$VERSION   	= '2.003000';  # v2.3.0
-
-$USER_MATCH = qr{ \buser=(?!	# must have user, but NOT ...
-	(?: nobody | %[20]0 )?	# nobody or space or null or nothing ...
-	(?: \s | ; | $ )	# followed by whitespace, ;, or EOS
-)}x;
-$DAYPASS_MATCH = qr{\bdaypassconfcode=};
 
 # Declare custom directives
 my @directives = (
@@ -82,7 +73,24 @@ my @directives = (
 #        	errmsg          => 'Associate a host with a given section name',
 #        	args_how        => TAKE2,
 #	        req_override    => RSRC_CONF
-#        }
+#        },
+
+	{
+		name		=> 'SlashEnableENV',
+		func		=> __PACKAGE__ . '::SlashEnableENV',
+		errmsg		=> 'Takes a flag that is either on or off (off by default)',
+		args_how	=> FLAG,
+		req_override	=> RSRC_CONF
+	},
+
+	{
+		name		=> 'SlashAuthAll',
+		func		=> __PACKAGE__ . '::SlashEnableENV',
+		errmsg		=> 'Takes a flag that is either on or off (off by default)',
+		args_how	=> FLAG,
+		req_override	=> RSRC_CONF
+	},
+	
 );
 
 Apache2::Module::add(__PACKAGE__, \@directives);
@@ -298,6 +306,17 @@ sub SlashCompileTemplates ($$$) {
 	# let's make sure
 	$slashdb->{_dbh}->disconnect;
 }
+
+sub SlashEnableENV ($$$) {
+        my($cfg, $params, $flag) = @_;
+        $cfg->{env} = $flag;
+}
+
+sub SlashAuthAll ($$$) {
+        my($cfg, $params, $flag) = @_;
+        $cfg->{auth} = $flag;
+}
+
 
 sub DESTROY { }
 

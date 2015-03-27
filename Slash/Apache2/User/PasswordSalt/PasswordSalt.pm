@@ -2,7 +2,7 @@
 # Copyright 1997-2005 by Open Source Technology Group. See README
 # and COPYING for more information, or see http://slashcode.com/.
 
-package Slash::Apache::User::PasswordSalt;
+package Slash::Apache2::User::PasswordSalt;
 
 use strict;
 use Carp;
@@ -103,7 +103,7 @@ sub abortIfSuspiciousCaller() {
 		my($package, $filename, $line, $subroutine) = @c;
 		# If we go back up the call chain to a package we know we can
 		# trust, then we can stop looking.
-		last if $package =~ /^(main|Apache::PerlRun|Apache::ROOT.*)$/;
+		last if $package =~ /^(main|Apache2::PerlRun|Apache2::ROOT.*)$/;
 		if ($package =~ /^Template/ || $subroutine eq '(eval)') {
 			# This exits the entire script immediately.
 			confess(scalar(gmtime) . " $$ SuspiciousCaller for salt at package '$package'");
@@ -118,10 +118,10 @@ __END__
 
 =head1 NAME
 
-Slash::Apache::User::PasswordSalt - Salt user passwords for security
+Slash::Apache2::User::PasswordSalt - Salt user passwords for security
 
 =head1 SEE ALSO
 
-Slash::Apache::User(3).
+Slash::Apache2::User(3).
 
 =cut

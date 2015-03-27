@@ -2,12 +2,12 @@
 # Copyright 1997-2005 by Open Source Technology Group. See README
 # and COPYING for more information, or see http://slashcode.com/.
 
-package Slash::Apache::TemplatePages;
+package Slash::Apache2::TemplatePages;
 
 use strict;
 use Slash::Display;
 use Slash::Utility;
-use Apache::Constants qw(:common);
+use Apache2::Constants qw(:common);
 
 our $VERSION = $Slash::Constants::VERSION;
 
@@ -49,11 +49,11 @@ __END__
 
 =head1 NAME
 
-Slash::Apache::TemplatePages - Handles logging for slashdot
+Slash::Apache2::TemplatePages - Handles logging for slashdot
 
 =head1 SYNOPSIS
 
-	use Slash::Apache::TemplatePages;
+	use Slash::Apache2::TemplatePages;
 
 =head1 DESCRIPTION
 

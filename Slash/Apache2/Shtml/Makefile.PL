@@ -1,11 +1,11 @@
-package Slash::Apache::Shtml;
+package Slash::Apache2::Shtml;
 use ExtUtils::MakeMaker;
 
-use Apache::ExtUtils;
-use Apache::src ();
+#use Apache2::ExtUtils;
+#use Apache2::src ();
 
 WriteMakefile(
-	'NAME'	=> 'Slash::Apache::Shtml',
+	'NAME'	=> 'Slash::Apache2::Shtml',
 	'VERSION_FROM' => 'Shtml.pm',
-	'INC'       => Apache::src->new->inc,
+#	'INC'       => Apache2::src->new->inc,
 );
