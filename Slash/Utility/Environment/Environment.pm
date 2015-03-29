@@ -24,7 +24,7 @@ LONG DESCRIPTION.
 =cut
 
 use strict;
-use Apache::ModuleConfig;
+use Apache2::ModuleConfig ();
 use Apache2::RequestUtil ();
 use Digest::MD5 'md5_hex';
 use Time::HiRes;
@@ -242,7 +242,7 @@ sub getCurrentMenu {
 		}
 
 		my $r = Apache2::RequestUtil->request;
-		my $cfg = Apache::ModuleConfig->get($r, 'Slash::Apache');
+		my $cfg = Apache2::Module->get_config($r, 'Slash::Apache');
 
 		return unless $cfg->{menus}{$menu};
 		@menus = @{$cfg->{menus}{$menu}};
@@ -293,7 +293,7 @@ sub getCurrentUser {
 	my $user;
 
 	if ($ENV{GATEWAY_INTERFACE} && (my $r = Apache2::RequestUtil->request)) {
-		my $cfg = Apache::ModuleConfig->get($r, 'Slash::Apache');
+		my $cfg = Apache2::Module->get_config($r, 'Slash::Apache');
 		$user = $cfg->{user} ||= {};
 	} else {
 		$user = $static_user ||= {};
@@ -339,7 +339,7 @@ sub setCurrentUser {
 
 	if ($ENV{GATEWAY_INTERFACE}) {
 		my $r = Apache2::RequestUtil->request;
-		my $cfg = Apache::ModuleConfig->get($r, 'Slash::Apache');
+		my $cfg = Apache2::Module->get_config($r, 'Slash::Apache');
 		$user = $cfg->{'user'};
 	} else {
 		$user = $static_user;
@@ -384,7 +384,7 @@ sub setCurrentForm {
 
 	if ($ENV{GATEWAY_INTERFACE}) {
 		my $r = Apache2::RequestUtil->request;
-		my $cfg = Apache::ModuleConfig->get($r, 'Slash::Apache');
+		my $cfg = Apache2::Module->get_config($r, 'Slash::Apache');
 		$form = $cfg->{'form'};
 	} else {
 		$form = $static_form;
@@ -425,7 +425,7 @@ sub createCurrentUser {
 	$user ||= {};
 
 	if ($ENV{GATEWAY_INTERFACE} && (my $r = Apache2::RequestUtil->request)) {
-		my $cfg = Apache::ModuleConfig->get($r, 'Slash::Apache');
+		my $cfg = Apache2::Module->get_config($r, 'Slash::Apache');
 		$cfg->{'user'} = $user;
 	} else {
 		$static_user = $user;
@@ -464,7 +464,7 @@ sub getCurrentForm {
 	my $form;
 
 	if ($ENV{GATEWAY_INTERFACE} && (my $r = Apache2::RequestUtil->request)) {
-		my $cfg = Apache::ModuleConfig->get($r, 'Slash::Apache');
+		my $cfg = Apache2::Module->get_config($r, 'Slash::Apache');
 		$form = $cfg->{'form'};
 	} else {
 		$form = $static_form;
@@ -506,7 +506,7 @@ sub createCurrentForm {
 
 	if ($ENV{GATEWAY_INTERFACE}) {
 		my $r = Apache2::RequestUtil->request;
-		my $cfg = Apache::ModuleConfig->get($r, 'Slash::Apache');
+		my $cfg = Apache2::Module->get_config($r, 'Slash::Apache');
 		$cfg->{'form'} = $form;
 	} else {
 		$static_form = $form;
@@ -547,7 +547,7 @@ sub getCurrentCookie {
 
 	if ($ENV{GATEWAY_INTERFACE}) {
 		my $r = Apache2::RequestUtil->request;
-		my $cfg = Apache::ModuleConfig->get($r, 'Slash::Apache');
+		my $cfg = Apache2::Module->get_config($r, 'Slash::Apache');
 		$cookie = $cfg->{'cookie'};
 	} else {
 		$cookie = $static_cookie;
@@ -589,7 +589,7 @@ sub createCurrentCookie {
 
 	if ($ENV{GATEWAY_INTERFACE}) {
 		my $r = Apache2::RequestUtil->request;
-		my $cfg = Apache::ModuleConfig->get($r, 'Slash::Apache');
+		my $cfg = Apache2::Module->get_config($r, 'Slash::Apache');
 		$cfg->{'cookie'} = $cookie;
 	} else {
 		$static_cookie = $cookie;
@@ -629,7 +629,7 @@ sub getCurrentSkin {
 	my $current_skin;
 	if ($ENV{GATEWAY_INTERFACE}) {
 		my $r = Apache2::RequestUtil->request;
-		my $cfg = Apache::ModuleConfig->get($r, 'Slash::Apache');
+		my $cfg = Apache2::Module->get_config($r, 'Slash::Apache');
 		$current_skin = $cfg->{skin}  ||= {};
 	} else {
 		$current_skin = $static_skin  ||= {};
@@ -672,7 +672,7 @@ sub setCurrentSkin {
 	my $current_skin;
 	if ($ENV{GATEWAY_INTERFACE}) {
 		my $r = Apache2::RequestUtil->request;
-		my $cfg = Apache::ModuleConfig->get($r, 'Slash::Apache');
+		my $cfg = Apache2::Module->get_config($r, 'Slash::Apache');
 		$current_skin = $cfg->{skin} ||= {};
 	} else {
 		$current_skin = $static_skin ||= {};
@@ -751,7 +751,7 @@ sub getCurrentStatic {
 	my $constants;
 
 	if ($ENV{GATEWAY_INTERFACE} && (my $r = Apache2::RequestUtil->request)) {
-		my $const_cfg = Apache::ModuleConfig->get($r, 'Slash::Apache');
+		my $const_cfg = Apache2::Module->get_config($r, 'Slash::Apache');
 		$constants = $want_secure
 			? $const_cfg->{constants_secure} : $const_cfg->{constants};
 	} else {
@@ -859,7 +859,7 @@ sub getCurrentAnonymousCoward {
 	my $ref;
 	if ($ENV{GATEWAY_INTERFACE}) {
 		my $r = Apache2::RequestUtil->request;
-		my $const_cfg = Apache::ModuleConfig->get($r, 'Slash::Apache') or return;
+		my $const_cfg = Apache2::Module->get_config($r, 'Slash::Apache') or return;
 		$ref = $const_cfg->{anonymous_coward};
 	} else {
 		$ref = $static_anonymous_coward;
@@ -920,7 +920,7 @@ The current virtual user that the site is running under.
 
 sub getCurrentVirtualUser {
 	if ($ENV{GATEWAY_INTERFACE} && (my $r = Apache2::RequestUtil->request)) {
-		my $cfg = Apache::ModuleConfig->get($r, 'Slash::Apache');
+		my $cfg = Apache2::Module->get_config($r, 'Slash::Apache');
 		return $cfg->{'VirtualUser'};
 	} else {
 		return $static_virtual_user;
@@ -978,7 +978,7 @@ sub getCurrentDB {
 	my $slashdb;
 
 	if ($ENV{GATEWAY_INTERFACE} && (my $r = Apache2::RequestUtil->request)) {
-		my $const_cfg = Apache::ModuleConfig->get($r, 'Slash::Apache');
+		my $const_cfg = Apache2::Module->get_config($r, 'Slash::Apache');
 		$slashdb = $const_cfg->{slashdb};
 	} else {
 		$slashdb = $static_db;
@@ -2446,7 +2446,7 @@ sub getObject {
 	return undef unless $vuser && $class;
 
 	if ($ENV{GATEWAY_INTERFACE} && (my $r = Apache2::RequestUtil->request)) {
-		$cfg     = Apache::ModuleConfig->get($r, 'Slash::Apache');
+		$cfg     = Apache2::Module->get_config($r, 'Slash::Apache');
 		$objects = $cfg->{'objects'} ||= {};
 	} else {
 		$objects = $static_objects   ||= {};
@@ -3607,7 +3607,7 @@ sub getCurrentCache {
 	my $cache;
 
 	if ($ENV{GATEWAY_INTERFACE} && (my $r = Apache2::RequestUtil->request)) {
-		my $cfg = Apache::ModuleConfig->get($r, 'Slash::Apache');
+		my $cfg = Apache2::Module->get_config($r, 'Slash::Apache');
 		$cache = $cfg->{'cache'} ||= {};
 	} else {
 		$cache = $static_cache   ||= {};

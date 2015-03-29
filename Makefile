@@ -31,7 +31,7 @@ SLASH_PREFIX = /usr/local/slash
 # If this isn't used anymore, can we remove it?
 INIT = /etc
 USER = nobody
-GROUP = nobody
+GROUP = nogroup
 CP = cp
 INSTALL = install
 UNAME = `uname`

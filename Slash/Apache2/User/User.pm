@@ -9,6 +9,7 @@ use Digest::MD5 'md5_hex';
 use Time::HiRes;
 use Apache2;
 use Apache2::Const qw(:common M_GET REDIRECT);
+use Apache2::Module ();
 use Apache2::RequestUtil ();
 #use Apache::Cookie;
 #use Apache::Request ();
@@ -54,8 +55,8 @@ sub handler {
 	# Ok, this will make it so that we can reliably use Apache2::RequestUtil->request
 	Apache2::RequestUtil->request($r);
 
-	my $cfg = Apache::ModuleConfig->get($r);
-	my $dbcfg = Apache::ModuleConfig->get($r, 'Slash::Apache');
+	my $cfg = Apache2::Module->get_config($r);
+	my $dbcfg = Apache2::Module->get_config($r, 'Slash::Apache');
 	my $constants = getCurrentStatic();
 	my $slashdb = $dbcfg->{slashdb};
 	my $apr = Apache::Request->new($r);

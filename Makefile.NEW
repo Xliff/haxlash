@@ -220,8 +220,8 @@ install: slash plugins
 
 
 reload: install
-	apachectl stop
-	apachectl start
+	apache2ctl stop
+	apache2ctl start
 #   cleanup
 clean:
 
