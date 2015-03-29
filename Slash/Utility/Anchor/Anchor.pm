@@ -24,7 +24,6 @@ LONG DESCRIPTION.
 =cut
 
 use strict;
-use Apache2;
 use Apache2::Const qw(:http);
 use Apache2::RequestUtil ();
 use Digest::MD5 'md5_hex';

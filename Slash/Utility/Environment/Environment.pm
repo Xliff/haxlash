@@ -24,7 +24,7 @@ LONG DESCRIPTION.
 =cut
 
 use strict;
-use Apache2::ModuleConfig ();
+use Apache2::Module ();
 use Apache2::RequestUtil ();
 use Digest::MD5 'md5_hex';
 use Time::HiRes;
