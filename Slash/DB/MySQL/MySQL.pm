@@ -2686,10 +2686,11 @@ sub createUser {
 		initdomain		=> $initdomain,
 		created_ipid		=> getCurrentUser('ipid') || '',
 	};
-	$newuser_data->{index_classic} = 1 if $ENV{HTTP_USER_AGENT} =~ /msie [2-6]/i;
+	
+	my($ua) = $ENV{HTTP_USER_AGENT} || '';
+	$newuser_data->{index_classic} = 1 if $ua =~ /msie [2-6]/i;
 
 	$self->setUser($uid, $newuser_data);
-
 	$self->sqlDo("COMMIT");
 	$self->sqlDo("SET AUTOCOMMIT=1");
 

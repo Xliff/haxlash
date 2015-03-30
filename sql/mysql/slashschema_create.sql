@@ -1443,6 +1443,7 @@ CREATE TABLE users_acl (
 # Table structure for table 'users_clout'
 #
 
+DROP TABLE users_clout;
 CREATE TABLE users_clout (
 	clout_id	int UNSIGNED NOT NULL AUTO_INCREMENT,
 	uid		mediumint UNSIGNED NOT NULL,

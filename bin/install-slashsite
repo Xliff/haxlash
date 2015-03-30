@@ -228,7 +228,7 @@ if ($opts{'P'}) {
 	print "if you select any beyond the default, you must look over their\n";
 	print "$SLASH_PREFIX/plugins/*/README* files.\n";
 	print "Enter 'a' to select all (which is probably a bad idea). Better, enter\n";
-	print "comma-separated numbers, or 'q' for none.\n";
+	print "comma-separated numbers, or 'q' for the current selection.\n";
 	while ($select ne 'q'){
 		chomp($select = <STDIN>);
 		if ($select =~ /^[\d ,]+$/) {

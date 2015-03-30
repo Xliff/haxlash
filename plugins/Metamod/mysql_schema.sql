@@ -19,7 +19,7 @@ CREATE TABLE metamodlog (
 	PRIMARY KEY id (id),
 	INDEX byuser (uid),
 	INDEX mmid (mmid)
-) TYPE=InnoDB;
+) Engine=InnoDB;
 
 #ALTER TABLE metamodlog ADD FOREIGN KEY (mmid) REFERENCES moderatorlog(id);
 #ALTER TABLE metamodlog ADD FOREIGN KEY (uid) REFERENCES users(uid);

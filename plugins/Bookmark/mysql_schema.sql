@@ -23,4 +23,4 @@ CREATE TABLE bookmark_feeds (
 	nofilter TINYINT UNSIGNED NOT NULL DEFAULT 0,
 	attended ENUM('no', 'yes') NOT NULL DEFAULT 'no',
 	PRIMARY KEY(id)
-) TYPE=InnoDB;
+) Engine=InnoDB;

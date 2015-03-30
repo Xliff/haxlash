@@ -8,4 +8,4 @@ CREATE TABLE shifts (
     INDEX byuser    (uid),
     INDEX bytime    (last_changed),
     INDEX byshift   (shift, uid, type)
-) TYPE=InnoDB;
+) Engine=InnoDB;
