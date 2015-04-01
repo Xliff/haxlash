@@ -7,7 +7,6 @@ package Slash::Apache2::User;
 use strict;
 use Digest::MD5 'md5_hex';
 use Time::HiRes;
-use Apache2;
 use Apache2::Const qw(:common M_GET REDIRECT);
 use Apache2::Module ();
 use Apache2::RequestUtil ();
@@ -41,13 +40,13 @@ my $srand_called;
 sub handler {
 	my($r) = @_;
 
-	return DECLINED unless $r->is_main;
+	return Apache2::Const::DECLINED unless $r->is_main;
 
 	my $uri = $r->uri;
 
 	# Exclude any URL that matches the environment variable regex
 	if ($ENV{SLASH_EXCLUDE_URL_USERHANDLER}) {
-		return OK if $uri =~ /$ENV{SLASH_EXCLUDE_URL_USERHANDLER}/;
+		return Apache2::Const::OK if $uri =~ /$ENV{SLASH_EXCLUDE_URL_USERHANDLER}/;
 	}
 
 	$request_start_time ||= Time::HiRes::time;
@@ -471,7 +470,7 @@ sub handler {
 		}
 	}
 
-	return OK;
+	return Apache2::Const::OK;
 }
 
 ########################################################
@@ -661,14 +660,14 @@ sub userdir_handler {
 		$r->args(join('&', @args));
 		$r->uri('/tags.pl');
 		$r->filename($constants->{basedir} . '/tags.pl');
-		return OK;
+		return Apache2::Const::OK;
 	}
 
 	if ($uri =~ m[^/help (?: /([^?]*) | /? ) $]x) {
 		$r->args("op=displayhelp");
 		$r->uri('/help.pl');
 		$r->filename($constants->{basedir} . '/help.pl');
-		return OK;
+		return Apache2::Const::OK;
 	}
 
 	# for self-references (/~/ and /my/)
@@ -743,13 +742,13 @@ sub userdir_handler {
 		$r->uri('/' . $r_uri);
 		$r->filename($constants->{basedir} . '/' . $r_uri);
 
-		return OK;
+		return Apache2::Const::OK;
 
 	} elsif ($uri =~ m[^/bookmarks (?: /(.*) | /? ) $]x) {
 		$r->args('op=showbookmarks');
 		$r->uri('/bookmark.pl');
 		$r->filename($constants->{basedir} . '/bookmark.pl');
-		return OK;
+		return Apache2::Const::OK;
 	}
 
 	# assuming Apache/mod_perl is decoding the URL in ->uri before
@@ -851,10 +850,10 @@ sub userdir_handler {
 		$r->uri('/' . $r_uri);
 		$r->filename($constants->{basedir} . '/' . $r_uri);
 
-		return OK;
+		return Apache2::Const::OK;
 	}
 
-	return DECLINED;
+	return Apache2::Const::DECLINED;
 } }
 
 

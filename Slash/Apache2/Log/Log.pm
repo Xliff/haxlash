@@ -6,7 +6,7 @@ package Slash::Apache2::Log;
 
 use strict;
 use Slash::Utility;
-use Apache2::Constants qw(:common);
+use Apache2::Const qw(:common);
 
 our $VERSION = $Slash::Constants::VERSION;
 

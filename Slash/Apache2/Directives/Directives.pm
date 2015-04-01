@@ -6,7 +6,6 @@ package Slash::Apache2::Directives;
 
 use strict;
 use Time::HiRes;
-use Apache2;
 use Apache2::Const qw(:common :cmd_how :override);
 use Apache2::CmdParms ();
 use Apache2::Module ();
