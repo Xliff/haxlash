@@ -134,21 +134,22 @@ sub header {
 			# Caching used to be Cache-Control: private but that doesn't
 			# seem to be correct; let's hope switching to no-cache
 			# causes few complaints.
-			$r->header_out('Cache-Control', 'no-cache');
+			$r->headers_out->add('Cache-Control', 'no-cache');
 			# And while Pragma: no-cache is not really correct (it's
 			# to be used for requests and the RFC doesn't define it to
 			# mean anything for responses) it probably doesn't hurt
 			# anything and allegedly has stopped users from complaining.
-			$r->header_out('Pragma', 'no-cache')
+			$r->headers_out->add('Pragma', 'no-cache')
 		}
 
 # 		unless ($user->{seclev} || $ENV{SCRIPT_NAME} =~ /comments/) {
-# 			$r->header_out('Cache-Control', 'no-cache');
+# 			$r->headers_out->add('Cache-Control', 'no-cache');
 # 		} else {
-# 			$r->header_out('Cache-Control', 'private');
+# 			$r->headers_out->add('Cache-Control', 'private');
 # 		}
 
-		$r->send_http_header;
+		# MOD_PERL1 ONLY!
+		#$r->send_http_header;
 		return if $r->header_only;
 	}
 
@@ -274,8 +275,10 @@ sub http_send {
 
 	my $r = Apache2::RequestUtil->request;
 	$r->content_type($opt->{content_type});
-	$r->header_out('Cache-Control', $opt->{cache_control}) if $opt->{cache_control};
-	$r->header_out('Pragma', $opt->{pragma}) if $opt->{pragma};
+	$r->headers_out->add(
+		'Cache-Control', $opt->{cache_control}
+	) if $opt->{cache_control};
+	$r->headers_out->('Pragma', $opt->{pragma}) if $opt->{pragma};
 
 	if ($opt->{etag} || $opt->{do_etag}) {
 		if ($opt->{do_etag} && $opt->{content}) {
@@ -283,9 +286,9 @@ sub http_send {
 				getCurrentStatic('utf8') ? encode_utf8($opt->{content}) : $opt->{content}
 			);
 		}
-		$r->header_out('ETag', $opt->{etag});
+		$r->headers_out->add('ETag', $opt->{etag});
 
-		my $match = $r->header_in('If-None-Match');
+		my $match = $r->headers_in->{'If-None-Match'};
 		if ($match && $match eq $opt->{etag}) {
 			$r->status(HTTP_NOT_MODIFIED);
 			$r->send_http_header;
@@ -301,7 +304,7 @@ sub http_send {
 			$opt->{dis_type} =~ s/\W+//;
 			$val = "$opt->{dis_type}; $val";
 		}
-		$r->header_out('Content-Disposition', $val);
+		$r->headers_out->add('Content-Disposition', $val);
 	}
 
 	$r->status($opt->{status});
@@ -418,7 +421,7 @@ sub redirect {
 	my $r = Apache2::RequestUtil->request;
 
 	$r->content_type($constants->{content_type_webpage} || 'text/html');
-	$r->header_out(Location => $url);
+	$r->headers_out->add('Location' => $url);
 	$r->status($code);
 	$r->send_http_header;
 
