@@ -40,7 +40,7 @@ sub handler {
 	# is not copying notes. Bad Apache!
 	# -Brian
 	my $uri = $r->uri;
-	my $dat = $r->err_header_out('SLASH_LOG_DATA');
+	my $dat = $r->err_headers_out->{'SLASH_LOG_DATA'};
 
 	# There used to be some (broken) logic here involving the
 	# log_admin var, but that's been moved to createLog().

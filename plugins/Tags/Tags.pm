@@ -5,7 +5,7 @@
 package Slash::Tags;
 
 use strict;
-use Apache::Cookie;
+#use Apache2::Cookie;
 use Date::Format qw( time2str );
 use Slash;
 use Slash::Display;

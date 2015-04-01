@@ -13,7 +13,7 @@ use Time::HiRes;
 use Slash::Slashboxes;
 
 sub main {
-my $start_time = Time::HiRes::time;
+	my $start_time = Time::HiRes::time;
 	my $constants	= getCurrentStatic();
 	my $user	= getCurrentUser();
 	my $form	= getCurrentForm();
@@ -789,6 +789,7 @@ sub displayStories {
 }
 
 #################################################################
+Apache2::Request->new($_->[0]);
 createEnvironment();
 main();
 

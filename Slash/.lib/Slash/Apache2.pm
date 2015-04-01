@@ -136,7 +136,7 @@ sub ConnectionIsSecure {
 sub IndexHandler {
 	my($r) = @_;
 
-	return DECLINED unless $r->is_main;
+	return DECLINED unless $r->main;
 	my $constants = getCurrentStatic();
 
 	#print STDERR scalar(localtime) . " $$ IndexHandler A\n";

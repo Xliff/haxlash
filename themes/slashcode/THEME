@@ -376,3 +376,4 @@ plugin=Users2
 plugin=Achievements
 plugin=Ajax
 plugin=DynamicBlocks
+plugin=Tags

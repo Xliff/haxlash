@@ -19,7 +19,7 @@ our $VERSION = $Slash::Constants::VERSION;
 sub handler {
 	my($r) = @_;
 
-	return DECLINED unless $r->is_main;
+	return DECLINED unless $r->main;
 
 	$Slash::Apache2::User::request_start_time ||= Time::HiRes::time;
 

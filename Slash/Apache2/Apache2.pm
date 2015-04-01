@@ -77,8 +77,8 @@ sub ProxyRemoteAddr ($) {
 	# presumably if the trusted IP does merely modify the header,
 	# it appends the actual original IP to its value).
 	my $xf = undef;
-	$xf = $r->header_in($trusted_header) if $trusted_header;
-	$xf ||= $r->header_in('X-Forwarded-For');
+	$xf = $r->headers_in->{$trusted_header} if $trusted_header;
+	$xf ||= $r->headers_in->{'X-Forwarded-For'};
 	if ($xf) {
 		if (my($ip) = $xf =~ /([\d.]+)$/) {
 			$r->connection->remote_ip($ip);
@@ -96,10 +96,11 @@ sub ConnectionIsSSL {
 	return 1 if $ENV{SSL_SESSION_ID};
 
 	# That probably didn't work so let's get that data the hard way.
-	my $r = Apache2::RequestUtil->request;
+	my($r);
+	eval { $r = Apache2::RequestUtil->request; };
 	return 0 if !$r;
 
-	my $x = $r->header_in('X-SFINC-SSL');
+	my $x = $r->headers_in->{'X-SFINC-SSL'};
 	return 1 if $x && $x eq 'true';
 
 	# This is a very expensive test and not one useful to us.
@@ -110,7 +111,7 @@ sub ConnectionIsSSL {
 #		return 1 if $se && $se eq 'on'; # https is on
 #	}
 
-	$x = $r->header_in('X-SSL-On');
+	$x = $r->headers_in->{'X-SSL-On'};
 	return 1 if $x && $x eq 'yes'; 
 
 	# We're out of ideas.  If the above didn't work we must not be
@@ -145,7 +146,9 @@ sub ConnectionIsSecure {
 sub IndexHandler {
 	my($r) = @_;
 
-	return DECLINED unless $r->is_main;
+	Apache2::RequestUtil->request($r);
+
+	return DECLINED unless $r->main;
 	my $constants = getCurrentStatic();
 
 #print STDERR scalar(localtime) . " $$ IndexHandler A\n";
@@ -153,7 +156,7 @@ sub IndexHandler {
 	my $gSkin     = getCurrentSkin();
 
 	my $uri = $r->uri;
-	my $cookie = $r->header_in('Cookie');
+	my $cookie = $r->headers_in->{'Cookie'} || '';
 	my $is_user = $cookie =~ $USER_MATCH;
 	my $has_daypass = 0;
 	if (!$is_user) {
@@ -198,7 +201,7 @@ sub IndexHandler {
 			# get to see the firehose if appropriate -- overriding
 			# the (non-users*) setting in the skin.
 			if ($constants->{index_anon_index_firehose}) {
-				my $ua = $r->header_in('User-Agent') || '';
+				my $ua = $r->headers_in->{'User-Agent'} || '';
 				my $ua_type =
 					  $ua =~ /MSIE [2-6]/ ? 'msie6'
 					: $ua =~ /MSIE 7/     ? 'msie7'
@@ -433,7 +436,7 @@ sub IndexHandler {
 	if ($constants->{referrer_external_static_redirect}
 		&& !$is_user && !$has_daypass
 		&& $uri eq '/article.pl') {
-		my $referrer = $r->header_in("Referer");
+		my $referrer = $r->headers_in->{'Referer'};
 		my $referrer_domain = $constants->{referrer_domain} || $gSkin->{basedomain};
 		my $the_request = $r->the_request;
 		if ($referrer

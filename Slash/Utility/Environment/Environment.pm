@@ -26,6 +26,7 @@ LONG DESCRIPTION.
 use strict;
 use Apache2::Module ();
 use Apache2::RequestUtil ();
+use Apache2::ServerUtil ();
 use Digest::MD5 'md5_hex';
 use Time::HiRes;
 use Slash::Constants ();
@@ -113,6 +114,7 @@ our @EXPORT  = qw(
 
 	apacheConnectionSSL
 
+	getRemoteIP
 );
 
 use constant DST_HR  => 0;
@@ -122,10 +124,12 @@ use constant DST_MON => 3;
 
 # These are file-scoped variables that are used when you need to use the
 # set methods when not running under mod_perl
-my($static_user, $static_form, $static_constants, $static_constants_secure,
+my(
+	$static_user, $static_form, $static_constants, $static_constants_secure,
 	$static_db, $static_anonymous_coward, $static_cookie,
 	$static_virtual_user, $static_objects, $static_cache, $static_hostname,
-	$static_skin);
+	$static_skin
+);
 
 # FRY: I don't regret this.  But I both rue and lament it.
 
@@ -179,16 +183,19 @@ sub dbAvailable {
 	# and lastval check in the hashrefs with that as the key
 	$token ||= '';
 
-	if (defined $dbAvailable_lastcheck->{$token} && time < ($dbAvailable_lastcheck->{$token} + 5)) {
-		return $dbAvailable_lastval->{$token};
-	}
-
+	return $dbAvailable_lastval->{$token}
+	if
+	   defined $dbAvailable_lastcheck->{$token}
+	   &&
+	   time < ($dbAvailable_lastcheck->{$token} + 5);
 
 	my $newval;
-	   if (-e "/usr/local/slash/dboff")		{ $newval = 0 }
+
+	if (-e "/usr/local/slash/dboff")		{ $newval = 0 }
 	elsif (!$token || $token !~ /^(\w+)/)		{ $newval = 1 }
 	elsif (-e "/usr/local/slash/dboff_$token")	{ $newval = 0 }
 	else						{ $newval = 1 }
+
 	$dbAvailable_lastval->{$token} = $newval;
 	$dbAvailable_lastcheck->{$token} = time;
 	return $newval;
@@ -421,13 +428,19 @@ Returns no value.
 
 sub createCurrentUser {
 	my($user) = @_;
-
 	$user ||= {};
 
-	if ($ENV{GATEWAY_INTERFACE} && (my $r = Apache2::RequestUtil->request)) {
-		my $cfg = Apache2::Module->get_config($r, 'Slash::Apache2');
-		$cfg->{'user'} = $user;
+	if (
+		$ENV{GATEWAY_INTERFACE} &&
+		(my $r = Apache2::RequestUtil->request)
+	) {
+		# Override the current user setting
+		my $cfg = Apache2::Module->get_config(
+			'Slash::Apache2::Directives', $r->server
+		);
+		$cfg->{user} = $user;
 	} else {
+		# CLI
 		$static_user = $user;
 	}
 }
@@ -3441,6 +3454,39 @@ sub get_srcid_vis {
 	my $vislen = getCurrentStatic('id_md5_vislength') || 5;
 	return substr($srcid, 2, $vislen);
 }
+
+
+#========================================================================
+
+=head2 getRemoteIP
+
+Previously code would be able to retrieve the remote IP of a user with 
+$r->remote_ip(), but given that Apache 2.4 has changed the API and
+Apache 2.2 is still in widespread use, there needs to be a transparent way
+to handle the change. 
+
+This routine is designed to replace all instances of $r->remote_ip to insure
+consistency.
+
+=cut
+
+sub getRemoteIP {
+	my($r);
+	return unless $ENV{GATEWAY_INTERFACE};
+	return unless ($r = Apache2::RequestUtil->request);
+
+	# Probably should be encapsulated
+	my $v = Apache2::ServerUtil::get_server_version();
+	$v =~ /(\d+)\.(\d+)(?:\.(\d+))/;
+	my($t, $h, $p) = ($1, $2, $3);
+	my $ver = $t * 1000 + $h * 100 + $p;
+
+	return $r->connection->remote_ip()
+		if $ver < 2400;
+
+	return $r->connection->client_ip();
+}	
+
 
 #========================================================================
 

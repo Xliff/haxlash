@@ -104,7 +104,7 @@ sub SlashVirtualUser ($$$) {
 	my $overrides = $cfg->{constants};
 
 	createCurrentVirtualUser($cfg->{VirtualUser} = $user);
-	createCurrentDB		($cfg->{slashdb} = Slash::DB->new($user));
+	createCurrentDB($cfg->{slashdb} = Slash::DB->new($user));
 	createCurrentStatic(
 		$cfg->{constants} = $cfg->{slashdb}->getSlashConf(0),
 	        $cfg->{constants_secure} = $cfg->{slashdb}->getSlashConf(1)
@@ -127,11 +127,16 @@ sub SlashVirtualUser ($$$) {
 		$cfg->{constants}{anonymous_coward_uid}
 	);
 
+	# XXX - This may not be do-able in the config stage. May need to move to 
+	# XXX - createEnvironment()
 	# Let's just do this once
-	setUserDate($anonymous_coward);
+	#setUserDate($anonymous_coward);
 
 	createCurrentAnonymousCoward($cfg->{anonymous_coward} = $anonymous_coward);
-	createCurrentUser($anonymous_coward);
+	
+	# XXX - This may not be do-able in the config stage. May need to move to 
+	# XXX - createEnvironment()
+	#createCurrentUser($anonymous_coward);
 
 	$cfg->{menus} = $cfg->{slashdb}->getMenus();
 

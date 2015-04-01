@@ -7,7 +7,7 @@
 package Slash::Apache2::Banlist;
 
 use strict;
-use Apache2::Constants qw(:common);
+use Apache2::Const qw(:common);
 use Apache2::RequestUtil ();
 
 use Slash;
@@ -20,7 +20,7 @@ our $VERSION = $Slash::Constants::VERSION;
 sub handler {
 	my($r) = @_;
 
-	return DECLINED unless $r->is_main;
+	return DECLINED unless $r->main;
 
 	$Slash::Apache2::User::request_start_time ||= Time::HiRes::time;
 

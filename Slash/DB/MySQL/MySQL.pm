@@ -6,7 +6,6 @@ package Slash::DB::MySQL;
 
 use strict;
 
-use Socket;
 use Digest::MD5 'md5_hex';
 use Encode 'encode_utf8';
 use Time::HiRes;
@@ -20,6 +19,9 @@ use URI ();
 use Slash::Utility;
 use Slash::Custom::ParUserAgent;
 use Slash::Constants ':messages';
+
+use Apache2::Connection ();
+use APR::SockAddr ();
 
 use vars qw($_proxy_port);
 
@@ -1293,6 +1295,9 @@ sub setContentFilter {
 ########################################################
 # This creates an entry in the accesslog
 sub createAccessLog {
+	# YYY - For now, if it's not through the web, we don't care.
+	return unless $ENV{'GATEWAY_INTERFACE'};
+
 	my($self, $op, $dat, $status) = @_;
 	return if !dbAvailable('write_accesslog');
 	my $constants = getCurrentStatic();
@@ -1332,7 +1337,7 @@ sub createAccessLog {
 
 	my($ipid, $subnetid) = (getCurrentUser('ipid'), getCurrentUser('subnetid'));
 	if (!$ipid || !$subnetid) {
-		($ipid, $subnetid) = get_ipids($r->connection->remote_ip);
+		($ipid, $subnetid) = get_ipids(getRemoteIP());
 	}
 
 	if ( $op eq 'index' && $dat =~ m|^([^/]*)| ) {
@@ -1373,14 +1378,13 @@ sub createAccessLog {
 	}
 	my $pagemark = $user->{state}{pagemark} || 0;
 	$pagemark = 0 if $op =~ /^ajax/;
-	my $local_addr = inet_ntoa(
-		( unpack_sockaddr_in($r->connection()->local_addr()) )[1]
-	);
+
+	my $local_addr = $r->connection()->local_addr()->ip_get();
 	$status ||= $r->status;
 	my $skid = $reader->getSkidFromName($skin_name);
 
 	my $query_string = $ENV{QUERY_STRING} || 'none';
-	my $referrer     = $r->header_in("Referer");
+	my $referrer     = $r->headers_in->{'Referer'};
 	if (!$referrer && $query_string =~ /\bfrom=(\w+)\b/) {
 		$referrer = $1;
 	}
@@ -1462,7 +1466,7 @@ sub createAccessLogAdmin {
 		: '';
 
 	$self->sqlInsert('accesslog_admin', {
-		host_addr	=> $r->connection->remote_ip,
+		host_addr	=> getRemoteIP(),
 		dat		=> $dat,
 		uid		=> $uid,
 		skid		=> $skid,
@@ -1754,7 +1758,7 @@ sub createBadPasswordLog {
 	# the real owner is.
 	my $realemail = $self->getUser($uid, 'realemail') || '';
 
-	my($ip, $subnet) = get_ipids($r->connection->remote_ip, 1);
+	my($ip, $subnet) = get_ipids(getRemoteIP(), 1);
 	$self->sqlInsert("badpasswords", {
 		uid =>          $uid,
 		password =>     $password_wrong,
@@ -4565,7 +4569,7 @@ sub setKnownOpenProxy {
 	my $xff;
 	if ($port) {
 		my $r = Apache2::RequestUtil->request;
-		$xff = $r->header_in('X-Forwarded-For') if $r;
+		$xff = $r->headers_in->{'X-Forwarded-For'} if $r;
 #use Data::Dumper; print STDERR "sKOP headers_in: " . Dumper([ $r->headers_in ]) if $r;
 	}
 	$xff = undef unless $xff && length($xff) >= 7
@@ -4589,7 +4593,7 @@ sub checkForOpenProxy {
 	# the current IP address is.
 	if (!$ip && $ENV{GATEWAY_INTERFACE}) {
 		my $r = Apache2::RequestUtil->request;
-		$ip = $r->connection->remote_ip if $r;
+		$ip = getRemoteIP() if $r;
 	}
 	# If we don't have an IP address, it can't be an open proxy.
 	return 0 if !$ip;

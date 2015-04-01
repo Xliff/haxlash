@@ -528,14 +528,17 @@ sub apache_site_conf {
     AllowOverride None
     Order allow,deny
     Allow from all
+    Require all granted
 </Directory>
 
 <VirtualHost $host_port>
     ServerAdmin $email
     DocumentRoot $prefix_site/$sitename/htdocs
     ServerName $host_noport
-    ErrorLog logs/${sitename}_error_log
-    CustomLog logs/${sitename}_access_log common
+    ErrorLog ${prefix_site}/${sitename}/logs/${sitename}_error_log
+    CustomLog ${prefix_site}/${sitename}/logs/${sitename}_access_log common
+
+    PerlOptions +GlobalRequest
 
     PerlSetupEnv On
     PerlSetEnv TZ GMT
@@ -600,14 +603,14 @@ $include
     # saving both startup time and memory in the child
     # add/remove scripts from \@pls (normally best to include only
     # and all commonly used scripts)
-    PerlModule Apache::RegistryLoader;
+    PerlModule ModPerl::RegistryLoader;
     <Perl>
         # if you need to debug, temporarily turn this on
-        # \$Apache::Registry::Debug = 4;
+        # \$ModPerl::Registry::Debug = 4;
         my \@pls     = qw(index comments article users journal search ajax firehose);
         my \$vhost   = '$host_noport';
         my \$docroot = '$prefix_site/$sitename/htdocs';
-        my \$r       = Apache::RegistryLoader->new;
+        my \$r       = ModPerl::RegistryLoader->new;
 
         for my \$u (\@pls) {
                 my \$f = "\$docroot/\$u.pl";

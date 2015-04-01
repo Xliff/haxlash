@@ -39,7 +39,7 @@ my $srand_called;
 sub handler {
 	my($r) = @_;
 
-	return DECLINED unless $r->is_main;
+	return DECLINED unless $r->main;
 
 	my $uri = $r->uri;
 

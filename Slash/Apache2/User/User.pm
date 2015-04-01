@@ -40,7 +40,7 @@ my $srand_called;
 sub handler {
 	my($r) = @_;
 
-	return Apache2::Const::DECLINED unless $r->is_main;
+	return Apache2::Const::DECLINED unless $r->main;
 
 	my $uri = $r->uri;
 
@@ -51,8 +51,10 @@ sub handler {
 
 	$request_start_time ||= Time::HiRes::time;
 
-	# Ok, this will make it so that we can reliably use Apache2::RequestUtil->request
-	Apache2::RequestUtil->request($r);
+	# Ok, this will make it so that we can reliably use
+	# Apache2::RequestUtil->request
+	#Apache2::RequestUtil->request($r);
+	my $apr = Apache::Request->new($r);
 
 	my $cfg = Apache2::Module->get_config($r);
 	my $dbcfg = Apache2::Module->get_config($r, 'Slash::Apache2');
