@@ -340,6 +340,7 @@ sub SlashAuthAll ($$$) {
 
 
 sub SlashShowConf($$) {
+	return;
         my($cfg, $params) = @_;
 
         printf STDERR "Configuration\n-------------\n\%s\n",

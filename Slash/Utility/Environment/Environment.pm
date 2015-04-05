@@ -400,7 +400,7 @@ sub setCurrentForm {
 		my $cfg = Apache2::Module->get_config(
 			'Slash::Apache2::Directives', $r->server()
 		);
-		$form = $cfg->{'form'};
+		$form = $cfg->{'form'} || {};
 	} else {
 		$form = $static_form;
 	}
@@ -488,7 +488,7 @@ sub getCurrentForm {
 		my $cfg = Apache2::Module::get_config(
 			'Slash::Apache2::Directives', $r->server()
 		);
-		$form = $cfg->{'form'};
+		$form = $cfg->{'form'} || {};
 	} else {
 		$form = $static_form;
 	}
@@ -2695,7 +2695,7 @@ sub writeLog {
 	# last look). Apache's directory sub handler
 	# is not copying notes. Bad Apache!
 	# -Brian
-	$r->err_header_out(SLASH_LOG_DATA => $dat);
+	$r->err_headers_out->add(SLASH_LOG_DATA => $dat);
 }
 
 sub getOpAndDatFromStatusAndURI {
@@ -3507,8 +3507,8 @@ sub getRemoteIP {
 	return unless ($r = Apache2::RequestUtil->request);
 
 	# Probably should be encapsulated
-	my $v = Apache2::ServerUtil::get_server_version();
-	$v =~ /(\d+)\.(\d+)(?:\.(\d+))/;
+	my $v = Apache2::ServerUtil::get_server_banner();
+	$v =~ m!Apache/(\d+)\.(\d+)(?:\.(\d+))!;
 	my($t, $h, $p) = ($1, $2, $3);
 	my $ver = $t * 1000 + $h * 100 + $p;
 
