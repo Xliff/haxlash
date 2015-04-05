@@ -8,8 +8,11 @@ use strict;
 use Digest::MD5 'md5_hex';
 use Time::HiRes;
 use Apache2::Const qw(:common M_GET REDIRECT);
+use Apache2::Cookie ();
 use Apache2::Module ();
+use Apache2::Request ();
 use Apache2::RequestUtil ();
+use Apache2::ServerUtil ();
 #use Apache::Cookie;
 #use Apache::Request ();
 #use Apache::File;
@@ -21,6 +24,8 @@ use Slash::Display;
 use Slash::Utility;
 use URI ();
 use vars qw($VERSION @ISA @QUOTES $USER_MATCH $request_start_time);
+
+use Data::Dumper ();
 
 #@ISA		= qw(DynaLoader);
 $VERSION   	= '2.003000';  # v2.3.0
@@ -40,27 +45,39 @@ my $srand_called;
 sub handler {
 	my($r) = @_;
 
-	return Apache2::Const::DECLINED unless $r->main;
+	#return Apache2::Const::DECLINED unless !$r->main;
 
 	my $uri = $r->uri;
 
 	# Exclude any URL that matches the environment variable regex
 	if ($ENV{SLASH_EXCLUDE_URL_USERHANDLER}) {
-		return Apache2::Const::OK if $uri =~ /$ENV{SLASH_EXCLUDE_URL_USERHANDLER}/;
+		return Apache2::Const::OK
+		if $uri =~ /$ENV{SLASH_EXCLUDE_URL_USERHANDLER}/;
 	}
 
 	$request_start_time ||= Time::HiRes::time;
 
+	my $cfg = Apache2::Module::get_config(
+		'Slash::Apache2::Directives', $r->server
+	);
+
+	printf STDERR "Configuration\n-----------\n%s\n\n", 
+		Data::Dumper->Dump([$cfg], [qw(cfg)]);
+	printf STDERR "Server\n------\n%s\n\n", 
+		Data::Dumper->Dump([$r->server], [qw(server)]);
+	printf STDERR "Main Server\n-----------\n%s\n\n", 
+		Data::Dumper->Dump(
+			[Apache2::ServerUtil->server()], 
+			[qw(main_server)]
+		);
+
 	# Ok, this will make it so that we can reliably use
 	# Apache2::RequestUtil->request
 	#Apache2::RequestUtil->request($r);
-	my $apr = Apache::Request->new($r);
+	my $apr = Apache2::Request->new($r);
 
-	my $cfg = Apache2::Module->get_config($r);
-	my $dbcfg = Apache2::Module->get_config($r, 'Slash::Apache2');
 	my $constants = getCurrentStatic();
-	my $slashdb = $dbcfg->{slashdb};
-	my $apr = Apache::Request->new($r);
+	my $slashdb = $cfg->{slashdb};
 	my $gSkin = getCurrentSkin();
 
 	my $reader_user = $slashdb->getDB('reader');
@@ -73,7 +90,7 @@ sub handler {
 		&& $constants->{cvs_tag_currentcode} =~ /_(\d+)$/) {
 		$version_code .= sprintf("%03d", $1);
 	}
-	$r->header_out('X-Powered-By' => $version_code);
+	$r->headers_out->add('X-Powered-By' => $version_code);
 
 	add_random_quote($r);
 
@@ -128,7 +145,7 @@ sub handler {
 	$form->{query_apache} = $apr;
 	@{$form}{keys  %{$constants->{form_override}}} =
 		values %{$constants->{form_override}};
-	my $cookies = Apache::Cookie->fetch($r);
+	my $cookies = Apache2::Cookie->fetch($r);
 
 	# So we are either going to pick the user up from
 	# the form, a cookie, or they will be anonymous
@@ -215,7 +232,7 @@ sub handler {
 			# not working ... move out into users.pl and index.pl
 			# I may know why this is the case, we may need
 			# to send a custom errormessage. -Brian
-#			$r->err_header_out(Location => $newurl);
+#			$r->err_headers_out->add(Location => $newurl);
 #			return REDIRECT;
 		}
 
@@ -389,7 +406,7 @@ sub handler {
 	createCurrentForm($form);
 
 	if ($gSkin->{require_acl} && !$user->{acl}{$gSkin->{require_acl}}) {
-		$r->err_header_out(Location =>
+		$r->err_headers_out->add(Location =>
 			URI->new_abs('/', $constants->{absolutedir})
 		);
 		return REDIRECT;
@@ -445,8 +462,9 @@ sub handler {
 		# so redirect them to the non-SSL URL.
 		my $newloc = $uri;
 		$newloc .= "?" . $r->args if $r->args;
-		$r->err_header_out(Location =>
-			URI->new_abs($newloc, $gSkin->{absolutedir}));
+		$r->err_headers_out->add(Location =>
+			URI->new_abs($newloc, $gSkin->{absolutedir})
+		);
 		return REDIRECT;
 	}
 
@@ -457,7 +475,7 @@ sub handler {
 	# a special test mode for getting a new template
 	# object (hence, fresh cache) for each request
 	if ($constants->{template_cache_request}) {
-		undef $dbcfg->{template};
+		undef $cfg->{template};
 	}
 
 	# Weird hack for getCurrentCache() till I can code up proper logic for it
@@ -498,15 +516,16 @@ sub add_random_quote {
 	my($r) = @_;
 	my $quote = $QUOTES[int(rand(@QUOTES))];
 	(my($who), $quote) = split(/: */, $quote, 2);
-	$r->header_out("X-$who" => $quote);
+	$r->headers_out->add("X-$who" => $quote);
 }
 
 sub add_author_quotes {
 	my($r) = @_;
-	$r->header_out('X-Author-Krow' => "You can't grep a dead tree.");
-	$r->header_out('X-Author-Pudge' => "Bite me.");
-	$r->header_out('X-Author-CaptTofu' => "I like Tofu.");
-	$r->header_out('X-Author-Jamie' => "I also enjoy tofu.");
+	$r->headers_out->add('X-Author-Krow' => "You can't grep a dead tree.");
+	$r->headers_out->add('X-Author-Pudge' => "Bite me.");
+	$r->headers_out->add('X-Author-CaptTofu' => "I like Tofu.");
+	$r->headers_out->add('X-Author-Jamie' => "I also enjoy tofu.");
+	$r->headers_out->add('X-Author-Xliff' => "I like the letter 'X'");
 }
 
 ########################################################

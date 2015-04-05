@@ -789,7 +789,7 @@ sub displayStories {
 }
 
 #################################################################
-Apache2::Request->new($_->[0]);
+#Apache2::Request->new($_->[0]);
 createEnvironment();
 main();
 

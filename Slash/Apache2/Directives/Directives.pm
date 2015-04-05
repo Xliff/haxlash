@@ -13,6 +13,7 @@ use Apache2::Directive ();
 use Slash::DB;
 use Slash::Display;
 use Slash::Utility;
+use Storable;
 use URI;
 
 
@@ -20,7 +21,7 @@ use URI;
 my @directives = (
 	{
 		name		=> 'SlashVirtualUser',
-		func		=> __PACKAGE__ . '::SlashVirtualUser',
+		#func		=> __PACKAGE__ . '::SlashVirtualUser',
 		errmsg          => 'Takes a DBIx::Password virtual name',
 		args_how        => TAKE1,
 		req_override    => RSRC_CONF
@@ -90,6 +91,14 @@ my @directives = (
 		req_override	=> RSRC_CONF
 	},
 	
+	{
+		name		=> 'SlashShowConf',
+		func		=> __PACKAGE__ . '::SlashShowConf',
+		errmsg		=> 'Takes no arguments',
+		args_how	=> NO_ARGS,
+		req_override	=> RSRC_CONF
+	},
+	
 );
 
 Apache2::Module::add(__PACKAGE__, \@directives);
@@ -98,7 +107,13 @@ Apache2::Module::add(__PACKAGE__, \@directives);
 # as you let Bender whet his beak.
 
 sub SlashVirtualUser ($$$) {
-	my($cfg, $params, $user) = @_;
+	my($pcfg, $params, $user) = @_;
+
+	# This should -NEVER- be called from a non-<VirtualHost>
+	# context.
+	return if $params->path();
+
+	my $cfg = Apache2::Module::get_config($pcfg, $params->server);
 
 	# In case someone calls SlashSetVar before we have done the big mojo -Brian
 	my $overrides = $cfg->{constants};
@@ -130,13 +145,13 @@ sub SlashVirtualUser ($$$) {
 	# XXX - This may not be do-able in the config stage. May need to move to 
 	# XXX - createEnvironment()
 	# Let's just do this once
-	#setUserDate($anonymous_coward);
+	setUserDate($anonymous_coward);
 
 	createCurrentAnonymousCoward($cfg->{anonymous_coward} = $anonymous_coward);
 	
 	# XXX - This may not be do-able in the config stage. May need to move to 
 	# XXX - createEnvironment()
-	#createCurrentUser($anonymous_coward);
+	createCurrentUser($anonymous_coward);
 
 	$cfg->{menus} = $cfg->{slashdb}->getMenus();
 
@@ -160,6 +175,8 @@ sub SlashVirtualUser ($$$) {
 	########################################
 
 	$cfg->{slashdb}->{_dbh}->disconnect if $cfg->{slashdb}->{_dbh};
+
+	#SlashShowConf(@_);
 }
 
 sub SlashSetVar ($$$$) {
@@ -321,6 +338,17 @@ sub SlashAuthAll ($$$) {
         $cfg->{auth} = $flag;
 }
 
+
+sub SlashShowConf($$) {
+        my($cfg, $params) = @_;
+
+        printf STDERR "Configuration\n-------------\n\%s\n",
+                Data::Dumper->Dump([$cfg], [qw(cfg)]
+	);
+        printf STDERR "Server\n------\n\%s\n",
+                Data::Dumper->Dump([$params->server], [qw(server)]
+	);
+}
 
 sub DESTROY { }
 

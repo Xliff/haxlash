@@ -2488,7 +2488,7 @@ sub getObject {
 	return undef unless $vuser && $class;
 
 	if ($ENV{GATEWAY_INTERFACE} && (my $r = Apache2::RequestUtil->request)) {
-		$cfg     = Apache2::Module::get_config(
+		$cfg = Apache2::Module::get_config(
 			'Slash::Apache2::Directives', $r->server()
 		);
 		$objects = $cfg->{'objects'} ||= {};
