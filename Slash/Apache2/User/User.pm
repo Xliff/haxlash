@@ -61,16 +61,6 @@ sub handler {
 		'Slash::Apache2::Directives', $r->server
 	);
 
-	printf STDERR "Configuration\n-----------\n%s\n\n", 
-		Data::Dumper->Dump([$cfg], [qw(cfg)]);
-	printf STDERR "Server\n------\n%s\n\n", 
-		Data::Dumper->Dump([$r->server], [qw(server)]);
-	printf STDERR "Main Server\n-----------\n%s\n\n", 
-		Data::Dumper->Dump(
-			[Apache2::ServerUtil->server()], 
-			[qw(main_server)]
-		);
-
 	# Ok, this will make it so that we can reliably use
 	# Apache2::RequestUtil->request
 	#Apache2::RequestUtil->request($r);

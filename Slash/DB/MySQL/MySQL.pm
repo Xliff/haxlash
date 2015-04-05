@@ -11343,8 +11343,14 @@ sub _getUser_do_selects {
 				$this_clout = $clout_hr->{$clid};
 			} else {
 				my $this_info = $clout_info->{$clid};
-				my $clout_obj = getObject($this_info->{class}, { db_type => 'reader' }); warn "no obj for '$this_info->{class}'" unless $clout_obj;
-				$this_clout = $clout_obj->getUserClout($answer) if $clout_obj;
+				my $clout_obj = getObject(
+					$this_info->{class},
+					{ db_type => 'reader' }
+				);
+				warn "no obj for '$this_info->{class}'"
+					unless $clout_obj;
+				$this_clout = $clout_obj->getUserClout($answer)
+					if $clout_obj;
 			}
 			$answer->{clout}{ $clout_types->{$clid} } = $this_clout
 				if defined($this_clout);
