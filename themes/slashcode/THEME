@@ -377,3 +377,5 @@ plugin=Achievements
 plugin=Ajax
 plugin=DynamicBlocks
 plugin=Tags
+plugin=TagModeration
+plugin=TagDataView

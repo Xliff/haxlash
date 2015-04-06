@@ -300,9 +300,15 @@ sub main {
 
 	my $metamod_elig = 0;
 	if ($constants->{m2}) {
-		my $metamod_reader = getObject('Slash::Metamod', { db_type => 'reader' });
+		my $metamod_reader = getObject(
+			'Slash::Metamod', { db_type => 'reader' }
+		);
 		$metamod_elig = $metamod_reader->metamodEligible($user);
 	}
+
+
+	print STDERR "\nU_CP: $user->{currentPage}\n\n";
+
 	slashDisplay('index', {
 		metamod_elig	=> $metamod_elig,
 		future_plug	=> $future_plug,
@@ -312,7 +318,9 @@ sub main {
 	});
 
 	footer();
-	#$slashdb->setUser($user->{uid}, { 'last_mainpage_view' => $last_mainpage_view }) if $last_mainpage_view;
+	#$slashdb->setUser($user->{uid}, {
+	#	'last_mainpage_view' => $last_mainpage_view
+	#}) if $last_mainpage_view;
 	writeLog($skin_name);
 
 #	{
@@ -731,7 +739,10 @@ sub displayStories {
 			push @commentcount_link, $thresh, ($story->{commentcount} || 0);
 			push @links, getData('comments', { cc => \@commentcount_link });
 
-			if ($story->{primaryskid} != $constants->{mainpage_skid} && $gSkin->{skid} == $constants->{mainpage_skid}) {
+			if (
+				$story->{primaryskid} != $constants->{mainpage_skid} &&
+				$gSkin->{skid} == $constants->{mainpage_skid}
+			) {
 				my $skin = $reader->getSkin($story->{primaryskid});
 				my $url;
 
@@ -740,16 +751,26 @@ sub displayStories {
 				} elsif ($user->{is_anon}) {
 					$url = $gSkin->{rootdir} . '/' . $story->{name} . '/';
 				} else {
-					$url = $gSkin->{rootdir} . '/' . $gSkin->{index_handler} . '?section=' . $skin->{name};
+					$url = $gSkin->{rootdir} . '/' . $gSkin->{index_handler} .
+						'?section=' . $skin->{name};
 				}
 	
-				push @links, [ $url, $skin->{hostname} || $skin->{title}, '', 'section'];
+				push @links, [
+					$url, $skin->{hostname} || $skin->{title}, '',
+					'section'
+				];
 			}
 	
 			if ($user->{seclev} >= 100) {
-				push @links, [ "$gSkin->{rootdir}/admin.pl?op=edit&sid=$story->{sid}", getData('edit'), '', 'edit' ];
+				push @links, [
+					"$gSkin->{rootdir}/admin.pl?op=edit&sid=$story->{sid}",
+					getData('edit'), '', 'edit'
+				];
 				if ($constants->{plugin}{Ajax}) {
-					my $signoff =  slashDisplay("signoff", { stoid => $story->{stoid}, storylink => 1 }, { Return => 1 } ); 
+					my $signoff =  slashDisplay("signoff", {
+						stoid => $story->{stoid},
+						storylink => 1
+					}, { Return => 1 } ); 
 					push @links, $signoff;
 				}
 			}
@@ -767,9 +788,9 @@ sub displayStories {
 	}
 	$return .= getData("briefarticles_end") if $dispmodelast eq "brief";
 
-
 	unless ($constants->{index_no_prev_next_day}) {
-		my($today, $tomorrow, $yesterday, $week_ago) = getOlderDays($form->{issue});
+		my($today, $tomorrow, $yesterday, $week_ago) =
+			getOlderDays($form->{issue});
 		$return .= slashDisplay('next_prev_issue', {
 			today		=> $today,
 			tomorrow	=> $tomorrow,

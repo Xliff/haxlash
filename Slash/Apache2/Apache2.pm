@@ -146,7 +146,7 @@ sub ConnectionIsSecure {
 sub IndexHandler {
 	my($r) = @_;
 
-	#Apache2::RequestUtil->request($r);
+	Apache2::RequestUtil->request($r);
 
 	return DECLINED unless !$r->main;
 	my $constants = getCurrentStatic();
@@ -433,9 +433,11 @@ sub IndexHandler {
 	# * no page number > 1 specified
 	# * sid specified
 	# * referrer exists AND is external to our site
-	if ($constants->{referrer_external_static_redirect}
+	if (
+		$constants->{referrer_external_static_redirect}
 		&& !$is_user && !$has_daypass
-		&& $uri eq '/article.pl') {
+		&& $uri eq '/article.pl'
+	) {
 		my $referrer = $r->headers_in->{'Referer'};
 		my $referrer_domain = $constants->{referrer_domain} || $gSkin->{basedomain};
 		my $the_request = $r->the_request;

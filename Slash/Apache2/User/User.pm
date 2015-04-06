@@ -44,7 +44,9 @@ my $srand_called;
 # handler method
 sub handler {
 	my($r) = @_;
-
+	
+	# XXX - Which one is it?
+	#return Apache2::Const::DECLINED unless $r->is_initial_req;
 	#return Apache2::Const::DECLINED unless !$r->main;
 
 	my $uri = $r->uri;
@@ -54,7 +56,6 @@ sub handler {
 		return Apache2::Const::OK
 		if $uri =~ /$ENV{SLASH_EXCLUDE_URL_USERHANDLER}/;
 	}
-
 	$request_start_time ||= Time::HiRes::time;
 
 	my $cfg = Apache2::Module::get_config(
@@ -63,8 +64,7 @@ sub handler {
 
 	# Ok, this will make it so that we can reliably use
 	# Apache2::RequestUtil->request
-	#Apache2::RequestUtil->request($r);
-	my $apr = Apache2::Request->new($r);
+	Apache2::RequestUtil->request($r);
 
 	my $constants = getCurrentStatic();
 	my $slashdb = $cfg->{slashdb};
@@ -122,6 +122,7 @@ sub handler {
 
 	my $method = $r->method;
 
+	my $apr = Apache2::Request->new($r);
 	my $form = filter_params($apr);
 
 #	$r->method('GET');
@@ -173,8 +174,10 @@ sub handler {
 		my $read_only = 0;
 		my $hostip = $r->connection->remote_ip;
 		my $srcids = get_srcids({ ip => $hostip });
-		$read_only = 1 if $reader->checkAL2($srcids,
-			[qw( nopost nopostanon openproxy )]);
+		$read_only = 1 if $reader->checkAL2(
+			$srcids,
+			[qw( nopost nopostanon openproxy )]
+		);
 
 		my $newpass;
 		if ($read_only || !$tmpuid) {
@@ -213,7 +216,8 @@ sub handler {
 					# For now, the code is just this text; later,
 					# I can change it to something else.
 					# -- pudge
-				  "&note=Please+change+your+password+now!&oldpass=" . fixparam($form->{upasswd})
+				  "&note=Please+change+your+password+now!&oldpass=" .
+				  fixparam($form->{upasswd})
 				: $form->{returnto}
 					? $form->{returnto}
 					: $uri),
@@ -330,7 +334,8 @@ sub handler {
 			$uid = $constants->{anonymous_coward_uid};
 		}
 	}
-#print STDERR scalar(localtime) . " $$ User handler uid=$uid gSkin->skid=$gSkin->{skid}\n";
+
+print STDERR scalar(localtime) . " $$ User handler uid=$uid gSkin->skid=$gSkin->{skid}\n";
 
 	# Ok, yes we could use %ENV here, but if we did and
 	# if someone ever wrote a module in another language
@@ -353,6 +358,8 @@ sub handler {
 	# we could cobble together with time() and $$ and so on.
 	srand() unless $srand_called;
 	$srand_called ||= 1;
+
+	print STDERR "\nUser::handler - pre bancheck!\n";
 
 	# If this uid is marked as banned, deny them access.
 	my $banlist = $reader->getBanList;
@@ -395,6 +402,8 @@ sub handler {
 	createCurrentUser($user);
 	createCurrentForm($form);
 
+	print STDERR "\nUser::handler - post createCurrentUser()!\n";
+
 	if ($gSkin->{require_acl} && !$user->{acl}{$gSkin->{require_acl}}) {
 		$r->err_headers_out->add(Location =>
 			URI->new_abs('/', $constants->{absolutedir})
@@ -408,17 +417,16 @@ sub handler {
 	# If allow_nonadmin_ssl is 2, then admins and subscribers are allowed in.
 	my $redirect_to_nonssl = 0;
 	if ($is_ssl && !(
-			# If the user is trying to log in, they are always
-			# allowed to make the attempt on the SSL server.
-			# Logging in means the users.pl script and either
-			# an empty op or the 'userlogin' op.
-			(
-			$uri =~ m{^/osdn-test/}
-			||
-			$uri =~ m{^/(?:users|login)\.pl}
-			) && (!$form->{op} || $form->{op} eq 'userlogin' || $form->{openid_login})
-		)
-	) {
+		# If the user is trying to log in, they are always
+		# allowed to make the attempt on the SSL server.
+		# Logging in means the users.pl script and either
+		# an empty op or the 'userlogin' op.
+		(
+		$uri =~ m{^/osdn-test/}
+		||
+		$uri =~ m{^/(?:users|login)\.pl}
+		) && (!$form->{op} || $form->{op} eq 'userlogin' || $form->{openid_login})
+	)) {
 		my $ans = $constants->{allow_nonadmin_ssl};
 		if ($ans == 1) {
 			# It's OK, anyone is allowed to use the SSL server.
