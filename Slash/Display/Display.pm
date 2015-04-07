@@ -238,8 +238,7 @@ sub slashDisplay {
 	if ($err) {
 		errorLog("$TEMPNAME : $err");
 	} else {
-		print $out unless $opt->{Return};
-		print STDERR $out;
+		printOutput($out) unless $opt->{Return};
 	}
 
 	# restore our original values

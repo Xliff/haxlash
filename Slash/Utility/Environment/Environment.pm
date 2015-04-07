@@ -117,6 +117,8 @@ our @EXPORT  = qw(
 	apacheConnectionSSL
 
 	getRemoteIP
+
+	printOutput
 );
 
 use constant DST_HR  => 0;
@@ -136,6 +138,41 @@ my(
 # FRY: I don't regret this.  But I both rue and lament it.
 
 #========================================================================
+
+
+=head2 printOutput(OUTPUT)
+
+Sends the data in OUTPUT to the proper destination stream. If running 
+in a MOD_PERL environment, this will retrive and use the response 
+handler as the output, otherwise it will send to STDOUT.
+
+Please note that this routine depends on the caller to set the proper
+MIME type.	
+
+=over 4
+
+=item Parameters
+
+=over 4
+
+=item OUTPUT
+
+Scalar containing the information to display.
+
+=cut
+
+sub printOutput {
+	my($output) = @_;
+
+	my $r;
+	eval { $r  = Apache2::RequestUtil->request(); } if $ENV{MOD_PERL};
+	if (defined $r) {
+		$r->print($output);
+	} else {
+		print $output;
+	}
+}
+
 
 =head2 dbAvailable([TOKEN])
 
